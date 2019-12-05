@@ -21,7 +21,10 @@ void Mesh::push_vertice(GLfloat *ver, GLuint len)
 
 void Mesh::erase_vertice(GLuint pos)
 {
-    vertices.erase(vertices.begin() + pos);
+    vertices.erase(vertices.begin() + pos * 6, vertices.begin() + pos * 6 + 5);
+    vbo.bind();
+    vbo.allocate(vertices.data(), int(vertices.size() * sizeof (GLfloat)));
+    vbo.release();
 }
 
 const vector<GLfloat> &Mesh::get_vertice() const
@@ -111,7 +114,7 @@ QString Mesh::get_indice_name(GLuint index) const
            QString::number(indices[index * 3 + 1]) + ", " +
            QString::number(indices[index * 3 + 2]);
 }
-
+/**    draw     **/
 void Mesh::draw(const QMatrix4x4 &projection, const QMatrix4x4 &view)
 {
     vbo.bind();

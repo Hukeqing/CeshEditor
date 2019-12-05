@@ -16,14 +16,7 @@
   <layout class="QVBoxLayout" name="verticalLayout">
    <item>
     <layout class="QFormLayout" name="formLayout">
-     <item row="0" column="1">
-      <widget class="QLabel" name="label">
-       <property name="text">
-        <string>Set Vertice: </string>
-       </property>
-      </widget>
-     </item>
-     <item row="1" column="0">
+     <item row="0" column="0">
       <widget class="QLabel" name="xLabel">
        <property name="minimumSize">
         <size>
@@ -34,12 +27,15 @@
        <property name="text">
         <string>X: </string>
        </property>
+       <property name="buddy">
+        <cstring>xLineEdit</cstring>
+       </property>
       </widget>
      </item>
-     <item row="1" column="1">
+     <item row="0" column="1">
       <widget class="QLineEdit" name="xLineEdit"/>
      </item>
-     <item row="2" column="0">
+     <item row="1" column="0">
       <widget class="QLabel" name="yLabel">
        <property name="minimumSize">
         <size>
@@ -50,12 +46,15 @@
        <property name="text">
         <string>Y: </string>
        </property>
+       <property name="buddy">
+        <cstring>yLineEdit</cstring>
+       </property>
       </widget>
      </item>
-     <item row="2" column="1">
+     <item row="1" column="1">
       <widget class="QLineEdit" name="yLineEdit"/>
      </item>
-     <item row="3" column="0">
+     <item row="2" column="0">
       <widget class="QLabel" name="zLabel">
        <property name="minimumSize">
         <size>
@@ -66,22 +65,28 @@
        <property name="text">
         <string>Z: </string>
        </property>
-      </widget>
-     </item>
-     <item row="3" column="1">
-      <widget class="QLineEdit" name="zLineEdit"/>
-     </item>
-     <item row="4" column="1">
-      <widget class="QPushButton" name="Color">
-       <property name="text">
-        <string>SetColor</string>
+       <property name="buddy">
+        <cstring>zLineEdit</cstring>
        </property>
       </widget>
      </item>
-     <item row="4" column="0">
+     <item row="2" column="1">
+      <widget class="QLineEdit" name="zLineEdit"/>
+     </item>
+     <item row="3" column="0">
       <widget class="QLabel" name="label_2">
        <property name="text">
-        <string>TextLabel</string>
+        <string>SetColor:</string>
+       </property>
+       <property name="buddy">
+        <cstring>Color</cstring>
+       </property>
+      </widget>
+     </item>
+     <item row="3" column="1">
+      <widget class="QPushButton" name="Color">
+       <property name="text">
+        <string>SetColor</string>
        </property>
       </widget>
      </item>
@@ -92,7 +97,20 @@
      <item>
       <widget class="QPushButton" name="OK">
        <property name="text">
-        <string>OK</string>
+        <string>Set</string>
+       </property>
+       <property name="shortcut">
+        <string>Return</string>
+       </property>
+      </widget>
+     </item>
+     <item>
+      <widget class="QPushButton" name="Delete">
+       <property name="cursor">
+        <cursorShape>ForbiddenCursor</cursorShape>
+       </property>
+       <property name="text">
+        <string>Delete</string>
        </property>
       </widget>
      </item>
@@ -107,6 +125,13 @@
    </item>
   </layout>
  </widget>
+ <tabstops>
+  <tabstop>xLineEdit</tabstop>
+  <tabstop>yLineEdit</tabstop>
+  <tabstop>zLineEdit</tabstop>
+  <tabstop>Color</tabstop>
+  <tabstop>OK</tabstop>
+ </tabstops>
  <resources/>
  <connections/>
 </ui>

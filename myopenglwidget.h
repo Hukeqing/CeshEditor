@@ -7,6 +7,7 @@
 #include <QOpenGLShaderProgram>
 #include <QPushButton>
 #include "mesh.h"
+#include "verticedialog.h"
 
 class MyOpenGLWidget : public QOpenGLWidget, protected QOpenGLFunctions
 {
@@ -16,7 +17,8 @@ public:
     explicit MyOpenGLWidget(QWidget *parent = nullptr);
 public slots:
     void verticeButton();
-//    void verticeSet(int index, float x, float y, float z, float r, float g, float b);
+    void verticeSet(int index, float x, float y, float z, float r, float g, float b);
+    void deleteVertice(int index);
 protected:
     void initializeGL();
     void paintGL();
@@ -29,6 +31,7 @@ private:
     Transform camera;
     GLfloat zoom_in, near_plane, far_plane;
     vector<QPushButton *> verticeButtonVector, indiceButtonVector;
+    verticeDialog *verticeSetDialog;
 };
 
 #endif // MYOPENGLWIDGET_H
