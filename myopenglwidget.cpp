@@ -28,7 +28,7 @@ MyOpenGLWidget::MyOpenGLWidget(QWidget *parent)
 
     zoomScroll = new QSlider(this);
     zoomScroll->setMinimum(1);
-    zoomScroll->setMaximum(180);
+    zoomScroll->setMaximum(179);
     zoomScroll->setSingleStep(1);
     zoomScroll->setOrientation(Qt::Horizontal);
     zoomScroll->setValue(45);
@@ -98,10 +98,10 @@ void MyOpenGLWidget::addVertice(float x, float y, float z, float r, float g, flo
 
 void MyOpenGLWidget::deleteVertice(int index)
 {
-    GLuint maxindice = 0;
+    int maxindice = -1;
     for (auto &item : mesh.get_indice())
-        maxindice = std::max(maxindice, item);
-    if (maxindice < mesh.get_vertice_number() - 1) {
+        maxindice = std::max(maxindice, int(item));
+    if (maxindice < int(mesh.get_vertice_number() - 1)) {
         mesh.erase_vertice(GLuint(index));
         delete verticeButtonVector[size_t(index)];
         verticeButtonVector.erase(verticeButtonVector.begin() + index);
