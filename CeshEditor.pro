@@ -8,7 +8,7 @@ QT       += core gui
 
 greaterThan(QT_MAJOR_VERSION, 4): QT += widgets
 
-TARGET = OpenGL
+TARGET = CeshEditor
 TEMPLATE = app
 
 # The following define makes your compiler emit warnings if you use
@@ -27,13 +27,18 @@ CONFIG += c++11
 SOURCES += \
         main.cpp \
         mesh.cpp \
-        myopenglwidget.cpp
+        myopenglwidget.cpp \
+        transform.cpp \
+        verticedialog.cpp
 
 HEADERS += \
     mesh.h \
-    myopenglwidget.h
+    myopenglwidget.h \
+    transform.h \
+    verticedialog.h
 
-FORMS +=
+FORMS += \
+    verticedialog.ui
 
 # Default rules for deployment.
 qnx: target.path = /tmp/$${TARGET}/bin
