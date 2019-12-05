@@ -76,6 +76,16 @@ void Transform::translate(const Vector3 &v)
 void Transform::rotate(const Vector3 &v)
 {
     rotation += v;
+    apply();
+}
+
+void Transform::get_view_matrix(QMatrix4x4 &m) const
+{
+    m.lookAt(position.data(), (position + forward).data(), up.data());
+}
+
+void Transform::apply()
+{
     forward.x = GLfloat(-sin(radians(rotation.y)));
     forward.y = GLfloat(sin(radians(rotation.x)));
     forward.z = GLfloat(cos(radians(rotation.x)) * cos(radians(rotation.y)));
@@ -83,9 +93,4 @@ void Transform::rotate(const Vector3 &v)
     up = cross(forward, left);
     left.normalize();
     up.normalize();
-}
-
-void Transform::get_view_matrix(QMatrix4x4 &m) const
-{
-    m.lookAt(position.data(), (position + forward).data(), up.data());
 }

@@ -25,6 +25,7 @@ DEFINES += QT_DEPRECATED_WARNINGS
 CONFIG += c++11
 
 SOURCES += \
+        indicedialog.cpp \
         main.cpp \
         mesh.cpp \
         myopenglwidget.cpp \
@@ -32,12 +33,14 @@ SOURCES += \
         verticedialog.cpp
 
 HEADERS += \
+    indicedialog.h \
     mesh.h \
     myopenglwidget.h \
     transform.h \
     verticedialog.h
 
 FORMS += \
+    indicedialog.ui \
     verticedialog.ui
 
 # Default rules for deployment.
@@ -46,9 +49,6 @@ else: unix:!android: target.path = /opt/$${TARGET}/bin
 !isEmpty(target.path): INSTALLS += target
 
 DISTFILES += \
-    v.fsh \
     v.vsh \
-    vc.fsh \
-    vc.vsh \
     vcm.fsh \
     vcm.vsh

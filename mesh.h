@@ -17,6 +17,7 @@ public:
     void erase_vertice(GLuint pos);
     const vector<GLfloat> &get_vertice() const;
     const GLfloat *get_vertice(GLuint pos) const;
+    GLuint get_vertice_number() const;
     Vector3 get_vertice_position(GLuint index) const;
     QString get_vertice_position_name(GLuint index) const;
     QColor get_vertice_color(GLuint index) const;
@@ -27,11 +28,14 @@ public:
     void push_indice(GLuint *ind, GLuint len = 1);
     void erase_indice(GLuint pos);
     const vector<GLuint> &get_indice() const;
+    const GLuint *get_indice(GLuint pos) const;
+    GLuint get_indice_number() const;
     QString get_indice_name(GLuint index) const;
 
     void draw(const QMatrix4x4 &projection, const QMatrix4x4 &view);
     const GLuint *get_indice_data() const;
     GLuint get_indices_len() const;
+    void change_indice(GLuint index, GLuint *value);
     Transform transform;                // 模型矩阵
 private:
     vector<GLfloat> vertices;           // 顶点信息

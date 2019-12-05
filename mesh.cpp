@@ -21,7 +21,7 @@ void Mesh::push_vertice(GLfloat *ver, GLuint len)
 
 void Mesh::erase_vertice(GLuint pos)
 {
-    vertices.erase(vertices.begin() + pos * 6, vertices.begin() + pos * 6 + 5);
+    vertices.erase(vertices.begin() + pos * 6, vertices.begin() + (pos + 1) * 6);
     vbo.bind();
     vbo.allocate(vertices.data(), int(vertices.size() * sizeof (GLfloat)));
     vbo.release();
@@ -35,6 +35,11 @@ const vector<GLfloat> &Mesh::get_vertice() const
 const GLfloat *Mesh::get_vertice(GLuint pos) const
 {
     return vertices.data() + pos * 6;
+}
+
+GLuint Mesh::get_vertice_number() const
+{
+    return GLuint(vertices.size() / 6);
 }
 
 Vector3 Mesh::get_vertice_position(GLuint index) const
@@ -100,12 +105,22 @@ void Mesh::push_indice(GLuint *ind, GLuint len)
 
 void Mesh::erase_indice(GLuint pos)
 {
-    indices.erase(indices.begin() + pos);
+    indices.erase(indices.begin() + pos * 3, indices.begin() + (pos + 1) * 3);
+}
+
+GLuint Mesh::get_indice_number() const
+{
+    return GLuint(indices.size() / 3);
 }
 
 const vector<GLuint> &Mesh::get_indice() const
 {
     return indices;
+}
+
+const GLuint *Mesh::get_indice(GLuint pos) const
+{
+    return indices.data() + pos * 3;
 }
 
 QString Mesh::get_indice_name(GLuint index) const
@@ -142,4 +157,10 @@ const GLuint *Mesh::get_indice_data() const
 GLuint Mesh::get_indices_len() const
 {
     return GLuint(indices.size());
+}
+
+void Mesh::change_indice(GLuint index, GLuint *value)
+{
+    for (GLuint i = 0; i < 3; ++i)
+        indices[index * 3 + i] = *(value + i);
 }

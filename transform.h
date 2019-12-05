@@ -26,6 +26,7 @@ public:
     void translate(const Vector3 &v);
     void rotate(const Vector3 &v);
     void get_view_matrix(QMatrix4x4 &m) const;
+    void apply();
 };
 
 #endif // TRANSFORM_H

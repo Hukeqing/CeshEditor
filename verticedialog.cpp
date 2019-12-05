@@ -23,14 +23,25 @@ verticeDialog::~verticeDialog()
 void verticeDialog::set(int index, const float *value)
 {
     this->index = index;
-    this->setWindowTitle(QString("CurVerticeID: ") + QString::number(index));
-    for (int i = 0; i < 3; ++i)
-        this->position[i] = value[i];
-    this->color.setRgb(int(value[3] * 255), int(value[4] * 255), int(value[5] * 255));
-    ui->xLineEdit->setText(QString::number(double(this->position[0])));
-    ui->yLineEdit->setText(QString::number(double(this->position[1])));
-    ui->zLineEdit->setText(QString::number(double(this->position[2])));
-    style_set();
+    if (value == nullptr) {
+        this->setWindowTitle(QString("New Vertice"));
+        ui->xLineEdit->setText(QString("0"));
+        ui->yLineEdit->setText(QString("0"));
+        ui->zLineEdit->setText(QString("0"));
+        color = Qt::white;
+        ui->Delete->setVisible(false);
+        style_set();
+    } else {
+        this->setWindowTitle(QString("CurVerticeID: ") + QString::number(index));
+        for (int i = 0; i < 3; ++i)
+            this->position[i] = value[i];
+        this->color.setRgb(int(value[3] * 255), int(value[4] * 255), int(value[5] * 255));
+        ui->xLineEdit->setText(QString::number(double(this->position[0])));
+        ui->yLineEdit->setText(QString::number(double(this->position[1])));
+        ui->zLineEdit->setText(QString::number(double(this->position[2])));
+        ui->Delete->setVisible(true);
+        style_set();
+    }
 }
 
 void verticeDialog::on_Color_clicked()
@@ -53,7 +64,10 @@ void verticeDialog::on_OK_clicked()
     position[0] = ui->xLineEdit->text().toFloat();
     position[1] = ui->yLineEdit->text().toFloat();
     position[2] = ui->zLineEdit->text().toFloat();
-    emit ok(index, position[0], position[1], position[2], color.red(), color.green(), color.blue());
+    if (index != -1)
+        emit ok(index, position[0], position[1], position[2], color.red(), color.green(), color.blue());
+    else
+        emit add(position[0], position[1], position[2], color.red(), color.green(), color.blue());
     this->close();
 }
 

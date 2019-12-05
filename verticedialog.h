@@ -17,6 +17,7 @@ public:
     void set(int index, const float *value);
 signals:
     void ok(int index, float x, float y, float z, float r, float g, float b);
+    void add(float x, float y, float z, float r, float g, float b);
     void delete_cmd(int index);
 private slots:
     void on_Color_clicked();
