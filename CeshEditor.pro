@@ -52,3 +52,5 @@ DISTFILES += \
     v.vsh \
     vcm.fsh \
     vcm.vsh
+
+RC_ICONS = logo.ico

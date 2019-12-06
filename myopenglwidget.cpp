@@ -55,8 +55,8 @@ void MyOpenGLWidget::meshRotate()
     double dist = 3;
     double rad = pitchSlider->value() / 180.0 * acos(-1);
 
-//    camera.position.z = GLfloat((1 - cos(rad)) * dist);
-//    camera.position.y = -GLfloat(sin(rad) * dist);
+    //    camera.position.z = GLfloat((1 - cos(rad)) * dist);
+    //    camera.position.y = -GLfloat(sin(rad) * dist);
     camera.position.y = -GLfloat(tan(rad) * dist);
     camera.rotation.x = pitchSlider->value();
     camera.apply();
@@ -181,16 +181,16 @@ void MyOpenGLWidget::initializeGL()
     initializeOpenGLFunctions();
     // 创建着色器程序
     GLfloat ver[] = {// front
-                     -0.5f,  0.5f,  0.5f, 1.0f, 0.0f, 0.0f,     // 0 RT
-                     -0.5f, -0.5f,  0.5f, 1.0f, 1.0f, 0.0f,     // 1 RB
-                      0.5f, -0.5f,  0.5f, 0.0f, 1.0f, 0.0f,     // 2 LB
-                      0.5f,  0.5f,  0.5f, 0.0f, 0.0f, 0.0f,     // 3 LT
-                     // back
-                     -0.5f,  0.5f, -0.5f, 1.0f, 0.0f, 1.0f,     // 4 RT
-                     -0.5f, -0.5f, -0.5f, 1.0f, 1.0f, 1.0f,     // 5 RB
-                      0.5f, -0.5f, -0.5f, 0.0f, 1.0f, 1.0f,     // 6 LB
-                      0.5f,  0.5f, -0.5f, 0.0f, 0.0f, 1.0f      // 7 LT
-                    };
+        -0.5f,  0.5f,  0.5f, 1.0f, 0.0f, 0.0f,     // 0 RT
+        -0.5f, -0.5f,  0.5f, 1.0f, 1.0f, 0.0f,     // 1 RB
+        0.5f, -0.5f,  0.5f, 0.0f, 1.0f, 0.0f,     // 2 LB
+        0.5f,  0.5f,  0.5f, 0.0f, 0.0f, 0.0f,     // 3 LT
+        // back
+        -0.5f,  0.5f, -0.5f, 1.0f, 0.0f, 1.0f,     // 4 RT
+        -0.5f, -0.5f, -0.5f, 1.0f, 1.0f, 1.0f,     // 5 RB
+        0.5f, -0.5f, -0.5f, 0.0f, 1.0f, 1.0f,     // 6 LB
+        0.5f,  0.5f, -0.5f, 0.0f, 0.0f, 1.0f      // 7 LT
+    };
     GLuint ind[] = {0, 1, 3,
                     1, 2, 3,
                     4, 5, 7,
@@ -206,7 +206,7 @@ void MyOpenGLWidget::initializeGL()
     mesh.init();
     mesh.push_vertice(ver, 8);
     mesh.push_indice(ind, 12);
-//    mesh.transform.rotate(Vector3(0, -60, -60));
+    //    mesh.transform.rotate(Vector3(0, -60, -60));
     mesh.transform.translate(Vector3(0, 0, 3));
     GUI();
 }
@@ -258,7 +258,7 @@ void MyOpenGLWidget::GUI()
     addIndiceButton->setFont(QFont("Fira Code"));
     connect(addIndiceButton, &QPushButton::clicked, this, &MyOpenGLWidget::indiceAddButton);
 
-//    qDebug() << indiceButtonVector[0]->pos();
+    //    qDebug() << indiceButtonVector[0]->pos();
 }
 
 void MyOpenGLWidget::reGUI_vertice(GLuint index)
@@ -294,7 +294,7 @@ void MyOpenGLWidget::reGUI_indice(GLuint index)
     int hei = std::min(60, h / int(mesh.get_indice_number() + 1));
     QPushButton *newButton = indiceButtonVector[index];
     newButton->setText(QString::number(index) + ": " + mesh.get_indice_name(index));
-//    newButton->setStyleSheet(mesh.get_vertice_css(index));
+    //    newButton->setStyleSheet(mesh.get_vertice_css(index));
     newButton->setGeometry(w - 100, int(index) * hei, 100, hei);
 }
 
@@ -307,7 +307,7 @@ void MyOpenGLWidget::add_indiceGUI()
     QPushButton *newButton = new QPushButton(this);
     newButton->setText(QString::number(i) + ": " + mesh.get_indice_name(i));
     newButton->setFont(QFont("Fira Code"));
-//    newButton->setStyleSheet(mesh.get_vertice_css(i));
+    //    newButton->setStyleSheet(mesh.get_vertice_css(i));
     newButton->setGeometry(w - 100, int(i) * hei, 100, hei);
     connect(newButton, &QPushButton::clicked, this, &MyOpenGLWidget::indiceButton);
     newButton->show();
