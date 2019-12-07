@@ -106,9 +106,6 @@
      </item>
      <item>
       <widget class="QPushButton" name="Delete">
-       <property name="cursor">
-        <cursorShape>ForbiddenCursor</cursorShape>
-       </property>
        <property name="text">
         <string>Delete</string>
        </property>

@@ -250,6 +250,7 @@ void MyOpenGLWidget::GUI()
         QPushButton *newButton = new QPushButton(this);
         newButton->setText(QString::number(i) + ": " + mesh.get_indice_name(i));
         newButton->setFont(QFont("Fira Code"));
+//        newButton->setStyleSheet("background:qlineargradient(spread:pad, x1:0, y1:0, x2:1, y2:0,stop:0 #FF0000, stop:0.5 #00FF00, stop:1 #0000FF);");
         connect(newButton, &QPushButton::clicked, this, &MyOpenGLWidget::indiceButton);
         indiceButtonVector.push_back(newButton);
     }
