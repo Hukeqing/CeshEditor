@@ -27,13 +27,7 @@
        <property name="text">
         <string>X: </string>
        </property>
-       <property name="buddy">
-        <cstring>xLineEdit</cstring>
-       </property>
       </widget>
-     </item>
-     <item row="0" column="1">
-      <widget class="QLineEdit" name="xLineEdit"/>
      </item>
      <item row="1" column="0">
       <widget class="QLabel" name="yLabel">
@@ -46,13 +40,7 @@
        <property name="text">
         <string>Y: </string>
        </property>
-       <property name="buddy">
-        <cstring>yLineEdit</cstring>
-       </property>
       </widget>
-     </item>
-     <item row="1" column="1">
-      <widget class="QLineEdit" name="yLineEdit"/>
      </item>
      <item row="2" column="0">
       <widget class="QLabel" name="zLabel">
@@ -65,16 +53,10 @@
        <property name="text">
         <string>Z: </string>
        </property>
-       <property name="buddy">
-        <cstring>zLineEdit</cstring>
-       </property>
       </widget>
      </item>
-     <item row="2" column="1">
-      <widget class="QLineEdit" name="zLineEdit"/>
-     </item>
      <item row="3" column="0">
-      <widget class="QLabel" name="label_2">
+      <widget class="QLabel" name="colorLabel">
        <property name="text">
         <string>SetColor:</string>
        </property>
@@ -87,6 +69,36 @@
       <widget class="QPushButton" name="Color">
        <property name="text">
         <string>SetColor</string>
+       </property>
+      </widget>
+     </item>
+     <item row="0" column="1">
+      <widget class="QDoubleSpinBox" name="xDoubleSpinBox">
+       <property name="minimum">
+        <double>-100.000000000000000</double>
+       </property>
+       <property name="maximum">
+        <double>100.000000000000000</double>
+       </property>
+      </widget>
+     </item>
+     <item row="1" column="1">
+      <widget class="QDoubleSpinBox" name="yDoubleSpinBox">
+       <property name="minimum">
+        <double>-100.000000000000000</double>
+       </property>
+       <property name="maximum">
+        <double>100.000000000000000</double>
+       </property>
+      </widget>
+     </item>
+     <item row="2" column="1">
+      <widget class="QDoubleSpinBox" name="zDoubleSpinBox">
+       <property name="minimum">
+        <double>-100.000000000000000</double>
+       </property>
+       <property name="maximum">
+        <double>100.000000000000000</double>
        </property>
       </widget>
      </item>
@@ -123,9 +135,6 @@
   </layout>
  </widget>
  <tabstops>
-  <tabstop>xLineEdit</tabstop>
-  <tabstop>yLineEdit</tabstop>
-  <tabstop>zLineEdit</tabstop>
   <tabstop>Color</tabstop>
   <tabstop>OK</tabstop>
  </tabstops>

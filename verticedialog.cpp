@@ -2,15 +2,13 @@
 #include "ui_verticedialog.h"
 #include <QColorDialog>
 #include <QDebug>
+#include <QDoubleSpinBox>
 
 verticeDialog::verticeDialog(QWidget *parent) :
     QDialog(parent), ui(new Ui::verticeDialog)
 {
     ui->setupUi(this);
     this->setMinimumSize(QSize(250, 150));
-    connect(ui->xLineEdit, &QLineEdit::editingFinished, this, &verticeDialog::editor_position);
-    connect(ui->yLineEdit, &QLineEdit::editingFinished, this, &verticeDialog::editor_position);
-    connect(ui->zLineEdit, &QLineEdit::editingFinished, this, &verticeDialog::editor_position);
     ui->OK->setStyleSheet(QString("background: #00FFFF;"));
     ui->Delete->setStyleSheet(QString("background: red;"));
 }
@@ -25,9 +23,9 @@ void verticeDialog::set(int index, const float *value)
     this->index = index;
     if (value == nullptr) {
         this->setWindowTitle(QString("New Vertice"));
-        ui->xLineEdit->setText(QString("0"));
-        ui->yLineEdit->setText(QString("0"));
-        ui->zLineEdit->setText(QString("0"));
+        ui->xDoubleSpinBox->setValue(0);
+        ui->yDoubleSpinBox->setValue(0);
+        ui->zDoubleSpinBox->setValue(0);
         color = Qt::white;
         ui->Delete->setVisible(false);
         style_set();
@@ -36,9 +34,10 @@ void verticeDialog::set(int index, const float *value)
         for (int i = 0; i < 3; ++i)
             this->position[i] = value[i];
         this->color.setRgb(int(value[3] * 255), int(value[4] * 255), int(value[5] * 255));
-        ui->xLineEdit->setText(QString::number(double(this->position[0])));
-        ui->yLineEdit->setText(QString::number(double(this->position[1])));
-        ui->zLineEdit->setText(QString::number(double(this->position[2])));
+//        ui->xLineEdit->setText(QString::number(double(this->position[0])));
+        ui->xDoubleSpinBox->setValue(double(this->position[0]));
+        ui->yDoubleSpinBox->setValue(double(this->position[1]));
+        ui->zDoubleSpinBox->setValue(double(this->position[2]));
         ui->Delete->setVisible(true);
         style_set();
     }
@@ -61,20 +60,14 @@ void verticeDialog::on_Cancel_clicked()
 
 void verticeDialog::on_OK_clicked()
 {
-    position[0] = ui->xLineEdit->text().toFloat();
-    position[1] = ui->yLineEdit->text().toFloat();
-    position[2] = ui->zLineEdit->text().toFloat();
+    position[0] = float(ui->xDoubleSpinBox->value());
+    position[1] = float(ui->yDoubleSpinBox->value());
+    position[2] = float(ui->zDoubleSpinBox->value());
     if (index != -1)
         emit ok(index, position[0], position[1], position[2], color.red(), color.green(), color.blue());
     else
         emit add(position[0], position[1], position[2], color.red(), color.green(), color.blue());
     this->close();
-}
-
-void verticeDialog::editor_position()
-{
-    QLineEdit *curLine = qobject_cast<QLineEdit *>(sender());
-    curLine->setText(QString::number(curLine->text().toDouble()));
 }
 
 void verticeDialog::on_Delete_clicked()
