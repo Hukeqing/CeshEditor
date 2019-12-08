@@ -25,6 +25,7 @@ DEFINES += QT_DEPRECATED_WARNINGS
 CONFIG += c++11
 
 SOURCES += \
+        color.cpp \
         indicedialog.cpp \
         main.cpp \
         mesh.cpp \
@@ -33,6 +34,7 @@ SOURCES += \
         verticedialog.cpp
 
 HEADERS += \
+    color.h \
     indicedialog.h \
     mesh.h \
     myopenglwidget.h \
