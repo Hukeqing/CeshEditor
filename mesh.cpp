@@ -124,6 +124,11 @@ void Mesh::change_vertice(GLuint index, GLfloat *value)
     vbo.allocate(vertices.data(), int(vertices.size() * sizeof (GLfloat)));
     vbo.release();
 }
+
+Color Mesh::get_vertice_color_class(GLuint index) const
+{
+    return Color(vertices.data() + index * 6 + 3);
+}
 /**    indice     **/
 void Mesh::push_indice(GLuint *ind, GLuint len)
 {
@@ -157,6 +162,20 @@ QString Mesh::get_indice_name(GLuint index) const
            QString::number(indices[index * 3 + 1]) + ", " +
            QString::number(indices[index * 3 + 2]);
 }
+
+void Mesh::change_indice(GLuint index, GLuint *value)
+{
+    for (GLuint i = 0; i < 3; ++i)
+        indices[index * 3 + i] = *(value + i);
+}
+
+QString Mesh::get_indice_3colorCup(GLuint index)
+{
+    return  Color::get3ColorCup(get_vertice_color_class(indices[index * 3 + 0]),
+                                get_vertice_color_class(indices[index * 3 + 1]),
+                                get_vertice_color_class(indices[index * 3 + 2]));
+}
+
 /**    draw     **/
 void Mesh::draw(const QMatrix4x4 &projection, const QMatrix4x4 &view)
 {
@@ -187,10 +206,13 @@ GLuint Mesh::get_indices_len() const
     return GLuint(indices.size());
 }
 
-void Mesh::change_indice(GLuint index, GLuint *value)
+void Mesh::clear()
 {
-    for (GLuint i = 0; i < 3; ++i)
-        indices[index * 3 + i] = *(value + i);
+    vertices.clear();
+    indices.clear();
+    vbo.bind();
+    vbo.allocate(vertices.data(), int(vertices.size() * sizeof (GLfloat)));
+    vbo.release();
 }
 
 void Mesh::writeCesh(std::fstream &out)

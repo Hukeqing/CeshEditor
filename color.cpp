@@ -37,7 +37,7 @@ Color::Color(float r, float g, float b, float a)
     data[3] = int(a * 255);
 }
 
-Color::Color(int *value, int len)
+Color::Color(const int *value, int len)
 {
     for (int i = 0; i < len; ++i)
         data[i] = value[i];
@@ -45,7 +45,7 @@ Color::Color(int *value, int len)
         data[3] = 255;
 }
 
-Color::Color(unsigned int *value, int len)
+Color::Color(const unsigned int *value, int len)
 {
     for (int i = 0; i < len; ++i)
         data[i] = int(value[i]);
@@ -53,7 +53,7 @@ Color::Color(unsigned int *value, int len)
         data[3] = 255;
 }
 
-Color::Color(float *value, int len)
+Color::Color(const float *value, int len)
 {
     for (int i = 0; i < len; ++i)
         data[i] = int(value[i] * 255);
@@ -114,4 +114,11 @@ int Color::blue255() const
 float Color::blue1() const
 {
     return data[2] * 1.0f / 255;
+}
+
+QString Color::get3ColorCup(const Color &a, const Color &b, const Color &c)
+{
+    return "background:qlineargradient(spread:pad, x1:0, y1:0, x2:1, y2:0,stop:0 " + a.getwell() +
+           ", stop:0.5 " + b.getwell() +
+           ", stop:1 "+ c.getwell() +");";
 }

@@ -15,6 +15,11 @@ struct Vector3 {
     Vector3 operator-(const Vector3 &other) const;
     Vector3 operator-();
     void operator-=(const Vector3 &other);
+    Vector3 operator*(int other) const;
+    Vector3 operator*(float other) const;
+    void operator*=(int other);
+    void operator*=(float other);
+    void fit();
     QVector3D data() const;
 };
 
