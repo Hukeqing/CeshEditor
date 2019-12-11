@@ -1,4 +1,7 @@
 ﻿#include "mesh.h"
+#include "defination.h"
+
+using std::endl;
 
 void Mesh::init()
 {
@@ -188,4 +191,26 @@ void Mesh::change_indice(GLuint index, GLuint *value)
 {
     for (GLuint i = 0; i < 3; ++i)
         indices[index * 3 + i] = *(value + i);
+}
+
+void Mesh::writeCesh(std::fstream &out)
+{
+    out << "Cesh file, Copyleft @ 2019 mauve" << endl;
+    out << VERSION << endl;
+    char *verticesBegin = reinterpret_cast<char *>(vertices.data());
+    char *verticesEnd = reinterpret_cast<char *>(vertices.data() + vertices.size());
+    out << std::distance(verticesBegin, verticesEnd) << endl;
+    auto iter = verticesBegin;
+    while (iter != verticesEnd) {
+        out << *iter;
+        iter++;
+    }
+    char *indicesBegin = reinterpret_cast<char *>(vertices.data());
+    char *indicesEnd = reinterpret_cast<char *>(vertices.data() + vertices.size());
+    out << std::distance(indicesEnd, indicesBegin) << endl;
+    iter = indicesBegin;
+    while (iter != indicesEnd) {
+        out << *iter;
+        iter++;
+    }
 }

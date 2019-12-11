@@ -35,6 +35,7 @@ SOURCES += \
 
 HEADERS += \
     color.h \
+    defination.h \
     indicedialog.h \
     mesh.h \
     myopenglwidget.h \
@@ -55,4 +56,4 @@ DISTFILES += \
     vcm.fsh \
     vcm.vsh
 
-RC_ICONS = logo.ico
+RC_ICONS = favicon.ico

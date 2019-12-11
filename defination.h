@@ -1,0 +1,6 @@
+#ifndef DEFINATION_H
+#define DEFINATION_H
+
+#define VERSION 10100
+
+#endif // DEFINATION_H
