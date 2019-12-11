@@ -60,6 +60,38 @@ void Vector3::operator-=(const Vector3 &other)
     z -= other.z;
 }
 
+Vector3 Vector3::operator*(int other) const
+{
+    Vector3 res(*this);
+    res.x *= other;
+    res.y *= other;
+    res.z *= other;
+    return res;
+}
+
+Vector3 Vector3::operator*(float other) const
+{
+    Vector3 res(*this);
+    res.x *= other;
+    res.y *= other;
+    res.z *= other;
+    return res;
+}
+
+void Vector3::operator*=(int other)
+{
+    this->x *= other;
+    this->y *= other;
+    this->z *= other;
+}
+
+void Vector3::operator*=(float other)
+{
+    this->x *= other;
+    this->y *= other;
+    this->z *= other;
+}
+
 QVector3D Vector3::data() const
 {
     return QVector3D(x, y, z);
@@ -76,6 +108,18 @@ void Transform::translate(const Vector3 &v)
 void Transform::rotate(const Vector3 &v)
 {
     rotation += v;
+    while (rotation.x > 180)
+        rotation.x -= 360;
+    while (rotation.x <= -180)
+        rotation.x += 360;
+    while (rotation.y > 180)
+        rotation.y -= 360;
+    while (rotation.y <= -180)
+        rotation.y += 360;
+    while (rotation.z > 180)
+        rotation.z -= 360;
+    while (rotation.z <= -180)
+        rotation.z += 360;
     apply();
 }
 

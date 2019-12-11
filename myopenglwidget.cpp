@@ -1,16 +1,23 @@
 #include "myopenglwidget.h"
+#include "color.h"
+#include "QMenuBar"
 #include <QOpenGLShaderProgram>
 #include <QHBoxLayout>
 #include <algorithm>
 #include <QMessageBox>
 #include <cmath>
-
+#include <QMouseEvent>
+#include <QDebug>
+// 1.0
 MyOpenGLWidget::MyOpenGLWidget(QWidget *parent)
     : QOpenGLWidget(parent)
 {
     zoom_in = 45.0f;
     near_plane = 0.1f;
     far_plane = 1000.0f;
+    addVerticeButton = nullptr;
+    addIndiceButton = nullptr;
+    lastMousePoint.setX(-1);
 
     rotationSlider = new QSlider(this);
     rotationSlider->setMinimum(-180);
@@ -19,12 +26,12 @@ MyOpenGLWidget::MyOpenGLWidget(QWidget *parent)
     rotationSlider->setOrientation(Qt::Horizontal);
     connect(rotationSlider, &QSlider::valueChanged, this, &MyOpenGLWidget::meshRotate);
 
-    pitchSlider = new QSlider(this);
-    pitchSlider->setMinimum(-45);
-    pitchSlider->setMaximum(45);
-    pitchSlider->setSingleStep(1);
-    pitchSlider->setOrientation(Qt::Vertical);
-    connect(pitchSlider, &QSlider::valueChanged, this, &MyOpenGLWidget::meshRotate);
+//    pitchSlider = new QSlider(this);
+//    pitchSlider->setMinimum(-45);
+//    pitchSlider->setMaximum(45);
+//    pitchSlider->setSingleStep(1);
+//    pitchSlider->setOrientation(Qt::Vertical);
+//    connect(pitchSlider, &QSlider::valueChanged, this, &MyOpenGLWidget::meshRotate);
 
     zoomScroll = new QSlider(this);
     zoomScroll->setMinimum(1);
@@ -45,6 +52,19 @@ MyOpenGLWidget::MyOpenGLWidget(QWidget *parent)
     connect(indiceSetDialog, &indiceDialog::ok, this, &MyOpenGLWidget::indiceSet);
     connect(indiceSetDialog, &indiceDialog::delete_cmd, this, &MyOpenGLWidget::deleteindice);
     connect(indiceSetDialog, &indiceDialog::add, this, &MyOpenGLWidget::addindice);
+
+    rightMenu = new QMenu(this);
+    QAction *action_showButton = rightMenu->addAction(QString("EditorMode"));
+    action_showButton->setCheckable(true);
+    action_showButton->setChecked(true);
+    QAction *action_reset = rightMenu->addAction(QString("reset"));
+    rightMenu->addSeparator();
+    QAction *action_clear = rightMenu->addAction(QString("clear"));
+    QAction *action_reCube = rightMenu->addAction(QString("recube"));
+    connect(action_showButton, &QAction::triggered, this, &MyOpenGLWidget::showButton);
+    connect(action_reset, &QAction::triggered, this, &MyOpenGLWidget::reset);
+    connect(action_clear, &QAction::triggered, this, &MyOpenGLWidget::clear);
+    connect(action_reCube, &QAction::triggered, this, &MyOpenGLWidget::cube);
 }
 
 void MyOpenGLWidget::meshRotate()
@@ -52,13 +72,13 @@ void MyOpenGLWidget::meshRotate()
     mesh.transform.rotation.y = rotationSlider->value();
     mesh.transform.apply();
 
-    double dist = 3;
-    double rad = pitchSlider->value() / 180.0 * acos(-1);
+//    double dist = 3;
+//    double rad = pitchSlider->value() / 180.0 * acos(-1);
 
-    //    camera.position.z = GLfloat((1 - cos(rad)) * dist);
-    //    camera.position.y = -GLfloat(sin(rad) * dist);
-    camera.position.y = -GLfloat(tan(rad) * dist);
-    camera.rotation.x = pitchSlider->value();
+//    camera.position.z = GLfloat((1 - cos(rad)) * dist);
+//    camera.position.y = -GLfloat(sin(rad) * dist);
+//    camera.position.y = -GLfloat(tan(rad) * dist);
+//    camera.rotation.x = pitchSlider->value();
     camera.apply();
     zoom_in = zoomScroll->value();
     update();
@@ -180,35 +200,26 @@ void MyOpenGLWidget::initializeGL()
     // 为当前环境初始化OpenGL函数
     initializeOpenGLFunctions();
     // 创建着色器程序
-    GLfloat ver[] = {// front
-        -0.5f,  0.5f,  0.5f, 1.0f, 0.0f, 0.0f,     // 0 RT
-        -0.5f, -0.5f,  0.5f, 1.0f, 1.0f, 0.0f,     // 1 RB
-        0.5f, -0.5f,  0.5f, 0.0f, 1.0f, 0.0f,     // 2 LB
-        0.5f,  0.5f,  0.5f, 0.0f, 0.0f, 0.0f,     // 3 LT
-        // back
-        -0.5f,  0.5f, -0.5f, 1.0f, 0.0f, 1.0f,     // 4 RT
-        -0.5f, -0.5f, -0.5f, 1.0f, 1.0f, 1.0f,     // 5 RB
-        0.5f, -0.5f, -0.5f, 0.0f, 1.0f, 1.0f,     // 6 LB
-        0.5f,  0.5f, -0.5f, 0.0f, 0.0f, 1.0f      // 7 LT
-    };
-    GLuint ind[] = {0, 1, 3,
-                    1, 2, 3,
-                    4, 5, 7,
-                    5, 6, 7,
-                    3, 2, 7,
-                    2, 6, 7,
-                    0, 1, 4,
-                    1, 5, 4,
-                    0, 7, 3,
-                    0, 4, 7,
-                    1, 6, 2,
-                    1, 5, 6};
     mesh.init();
-    mesh.push_vertice(ver, 8);
-    mesh.push_indice(ind, 12);
+    cube();
     //    mesh.transform.rotate(Vector3(0, -60, -60));
     mesh.transform.translate(Vector3(0, 0, 3));
-    GUI();
+}
+
+void MyOpenGLWidget::paintGL()
+{
+    glClearColor(0, 0, 0, 1);
+    glEnable(GL_DEPTH_TEST);
+    int w = width();
+    int h = height();
+
+    glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
+    QMatrix4x4 projection, view;
+    projection.perspective(zoom_in, GLfixed(w) / GLfloat(h), near_plane, far_plane);
+    camera.get_view_matrix(view);
+    mesh.draw(projection, view);
+
+    glDrawElements(GL_TRIANGLES, int(mesh.get_indices_len()), GL_UNSIGNED_INT, mesh.get_indice_data());
 }
 
 void MyOpenGLWidget::resizeGL(int w, int h)
@@ -227,7 +238,7 @@ void MyOpenGLWidget::resizeGL(int w, int h)
     addIndiceButton->setGeometry(w - 50, int(indiceButtonVector.size()) * hei, 50, hei / 2);
 
     rotationSlider->setGeometry(0, h - 50, 100, 20);
-    pitchSlider->setGeometry(100, h - 50, 20, 50);
+//    pitchSlider->setGeometry(100, h - 50, 20, 50);
     zoomScroll->setGeometry(0, h - 20, 100, 20);
 }
 
@@ -238,28 +249,34 @@ void MyOpenGLWidget::GUI()
         newButton->setText(QString::number(i) + ": " + mesh.get_vertice_position_name(i));
         newButton->setFont(QFont("Fira Code"));
         newButton->setStyleSheet(mesh.get_vertice_css(i));
+        newButton->show();
         connect(newButton, &QPushButton::clicked, this, &MyOpenGLWidget::verticeButton);
         verticeButtonVector.push_back(newButton);
     }
-    addVerticeButton = new QPushButton(this);
-    addVerticeButton->setText("New");
-    addVerticeButton->setFont(QFont("Fira Code"));
+    if (addVerticeButton == nullptr) {
+        addVerticeButton = new QPushButton(this);
+        addVerticeButton->setText("New");
+        addVerticeButton->setFont(QFont("Fira Code"));
+        addVerticeButton->show();
+    }
     connect(addVerticeButton, &QPushButton::clicked, this, &MyOpenGLWidget::verticeAddButton);
 
     for (GLuint i = 0; i < GLuint(mesh.get_indice_number()); ++i) {
         QPushButton *newButton = new QPushButton(this);
         newButton->setText(QString::number(i) + ": " + mesh.get_indice_name(i));
         newButton->setFont(QFont("Fira Code"));
-//        newButton->setStyleSheet("background:qlineargradient(spread:pad, x1:0, y1:0, x2:1, y2:0,stop:0 #FF0000, stop:0.5 #00FF00, stop:1 #0000FF);");
+//        newButton->setStyleSheet(mesh.get_indice_3colorCup(i));
+        newButton->show();
         connect(newButton, &QPushButton::clicked, this, &MyOpenGLWidget::indiceButton);
         indiceButtonVector.push_back(newButton);
     }
-    addIndiceButton = new QPushButton(this);
-    addIndiceButton->setText("New");
-    addIndiceButton->setFont(QFont("Fira Code"));
+    if (addIndiceButton == nullptr) {
+        addIndiceButton = new QPushButton(this);
+        addIndiceButton->setText("New");
+        addIndiceButton->setFont(QFont("Fira Code"));
+        addIndiceButton->show();
+    }
     connect(addIndiceButton, &QPushButton::clicked, this, &MyOpenGLWidget::indiceAddButton);
-
-    //    qDebug() << indiceButtonVector[0]->pos();
 }
 
 void MyOpenGLWidget::reGUI_vertice(GLuint index)
@@ -295,7 +312,7 @@ void MyOpenGLWidget::reGUI_indice(GLuint index)
     int hei = std::min(60, h / int(mesh.get_indice_number() + 1));
     QPushButton *newButton = indiceButtonVector[index];
     newButton->setText(QString::number(index) + ": " + mesh.get_indice_name(index));
-    //    newButton->setStyleSheet(mesh.get_vertice_css(index));
+//    newButton->setStyleSheet(mesh.get_indice_3colorCup(index));
     newButton->setGeometry(w - 100, int(index) * hei, 100, hei);
 }
 
@@ -308,26 +325,123 @@ void MyOpenGLWidget::add_indiceGUI()
     QPushButton *newButton = new QPushButton(this);
     newButton->setText(QString::number(i) + ": " + mesh.get_indice_name(i));
     newButton->setFont(QFont("Fira Code"));
-    //    newButton->setStyleSheet(mesh.get_vertice_css(i));
+//    newButton->setStyleSheet(mesh.get_indice_3colorCup(i));
     newButton->setGeometry(w - 100, int(i) * hei, 100, hei);
     connect(newButton, &QPushButton::clicked, this, &MyOpenGLWidget::indiceButton);
     newButton->show();
     indiceButtonVector.push_back(newButton);
     addIndiceButton->setGeometry(w - 50, int(i + 1) * hei, 50, hei / 2);
 }
-
-void MyOpenGLWidget::paintGL()
+// 2.0
+void MyOpenGLWidget::mousePressEvent(QMouseEvent *event)
 {
-    glClearColor(0, 0, 0, 1);
-    glEnable(GL_DEPTH_TEST);
-    int w = width();
-    int h = height();
+    if (event->button() == Qt::RightButton)
+        rightMenu->popup(event->globalPos());
+}
 
-    glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
-    QMatrix4x4 projection, view;
-    projection.perspective(zoom_in, GLfixed(w) / GLfloat(h), near_plane, far_plane);
-    camera.get_view_matrix(view);
-    mesh.draw(projection, view);
+void MyOpenGLWidget::mouseMoveEvent(QMouseEvent *event)
+{
+    if (event->buttons() & Qt::LeftButton) {
+        if (lastMousePoint.x() != -1) {
+            mesh.transform.rotate(Vector3(0, 0.3f, 0) * (event->x() - lastMousePoint.x()));
+            mesh.transform.rotate(Vector3(-0.3f, 0, 0) * (event->y() - lastMousePoint.y()));
+            rotationSlider->setValue(int(mesh.transform.rotation.y));
+        }
+        lastMousePoint = event->pos();
+    }
+    update();
+}
 
-    glDrawElements(GL_TRIANGLES, int(mesh.get_indices_len()), GL_UNSIGNED_INT, mesh.get_indice_data());
+void MyOpenGLWidget::mouseReleaseEvent(QMouseEvent *event)
+{
+    if (event->button() == Qt::LeftButton) {
+        lastMousePoint.setX(-1);
+    }
+}
+
+void MyOpenGLWidget::wheelEvent(QWheelEvent *event)
+{
+    //    qDebug() << event->angleDelta();
+    zoom_in -= event->angleDelta().y() / 24;
+    if (zoom_in > 179)
+        zoom_in = 179;
+    else if (zoom_in < 1) {
+        zoom_in = 1;
+    }
+    zoomScroll->setValue(int(zoom_in));
+    update();
+}
+
+void MyOpenGLWidget::showButton(bool isShow)
+{
+    for (auto &item : verticeButtonVector)
+        item->setVisible(isShow);
+    addVerticeButton->setVisible(isShow);
+    for (auto &item : indiceButtonVector)
+        item->setVisible(isShow);
+    addIndiceButton->setVisible(isShow);
+    rotationSlider->setVisible(isShow);
+    zoomScroll->setVisible(isShow);
+}
+
+void MyOpenGLWidget::reset()
+{
+    zoom_in = 45.0f;
+    zoomScroll->setValue(45);
+    mesh.transform.rotation = Vector3(0, 0, 0);
+    mesh.transform.apply();
+    rotationSlider->setValue(0);
+    update();
+}
+
+void MyOpenGLWidget::clear()
+{
+    mesh.clear();
+    for (auto &item : verticeButtonVector)
+        delete item;
+    for (auto &item : indiceButtonVector)
+        delete item;
+    verticeButtonVector.clear();
+    indiceButtonVector.clear();
+    resizeGL(width(), height());
+    update();
+}
+
+void MyOpenGLWidget::cube()
+{
+    mesh.clear();
+    for (auto &item : verticeButtonVector)
+        delete item;
+    for (auto &item : indiceButtonVector)
+        delete item;
+    verticeButtonVector.clear();
+    indiceButtonVector.clear();
+    GLfloat ver[] = {// front
+        -0.5f,  0.5f,  0.5f, 1.0f, 0.0f, 0.0f,     // 0 RT
+        -0.5f, -0.5f,  0.5f, 1.0f, 1.0f, 0.0f,     // 1 RB
+        0.5f, -0.5f,  0.5f, 0.0f, 1.0f, 0.0f,     // 2 LB
+        0.5f,  0.5f,  0.5f, 0.0f, 0.0f, 0.0f,     // 3 LT
+        // back
+        -0.5f,  0.5f, -0.5f, 1.0f, 0.0f, 1.0f,     // 4 RT
+        -0.5f, -0.5f, -0.5f, 1.0f, 1.0f, 1.0f,     // 5 RB
+        0.5f, -0.5f, -0.5f, 0.0f, 1.0f, 1.0f,     // 6 LB
+        0.5f,  0.5f, -0.5f, 0.0f, 0.0f, 1.0f      // 7 LT
+    };
+    GLuint ind[] = {0, 1, 3,
+                    1, 2, 3,
+                    4, 5, 7,
+                    5, 6, 7,
+                    3, 2, 7,
+                    2, 6, 7,
+                    0, 1, 4,
+                    1, 5, 4,
+                    0, 7, 3,
+                    0, 4, 7,
+                    1, 6, 2,
+                    1, 5, 6};
+    mesh.push_vertice(ver, 8);
+    mesh.push_indice(ind, 12);
+    GUI();
+    resizeGL(width(), height());
+    update();
 }

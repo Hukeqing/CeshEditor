@@ -1,5 +1,7 @@
 #include "indicedialog.h"
 #include "ui_indicedialog.h"
+#include <QMenuBar>
+#include <QToolBar>
 
 indiceDialog::indiceDialog(QWidget *parent) :
     QDialog(parent),
