@@ -92,13 +92,13 @@ void MyOpenGLWidget::verticeButton()
         if (send == verticeButtonVector[index])
             break;
     verticeSetDialog->set(int(index), mesh.get_vertice(GLuint(index)));
-    verticeSetDialog->show();
+    verticeSetDialog->exec();
 }
 
 void MyOpenGLWidget::verticeAddButton()
 {
     verticeSetDialog->set(-1, nullptr);
-    verticeSetDialog->show();
+    verticeSetDialog->exec();
 }
 
 void MyOpenGLWidget::verticeSet(int index, float x, float y, float z, float r, float g, float b)
@@ -141,13 +141,13 @@ void MyOpenGLWidget::indiceButton()
         if (send == indiceButtonVector[index])
             break;
     indiceSetDialog->set(int(index), mesh.get_indice(GLuint(index)));
-    indiceSetDialog->show();
+    indiceSetDialog->exec();
 }
 
 void MyOpenGLWidget::indiceAddButton()
 {
     indiceSetDialog->set(-1, nullptr);
-    indiceSetDialog->show();
+    indiceSetDialog->exec();
 }
 
 void MyOpenGLWidget::indiceSet(int index, unsigned int a, unsigned int b, unsigned int c)

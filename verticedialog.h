@@ -23,8 +23,8 @@ private slots:
     void on_Color_clicked();
     void on_Cancel_clicked();
     void on_OK_clicked();
-    void editor_position();
     void on_Delete_clicked();
+//    void on_edit();
 private:
     Ui::verticeDialog *ui;
     int index;
