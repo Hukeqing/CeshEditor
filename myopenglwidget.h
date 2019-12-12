@@ -42,7 +42,7 @@ private:
     Transform camera;
     GLfloat zoom_in, near_plane, far_plane;
     // transfrom
-    QSlider *rotationSlider, *zoomScroll;
+    QSlider *rotationSlider, *zoomScroll, *pitchSlider;
     // vertice Editor
     vector<QPushButton *> verticeButtonVector, indiceButtonVector;
     QPushButton *addVerticeButton, *addIndiceButton;

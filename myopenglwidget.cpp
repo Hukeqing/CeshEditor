@@ -26,12 +26,12 @@ MyOpenGLWidget::MyOpenGLWidget(QWidget *parent)
     rotationSlider->setOrientation(Qt::Horizontal);
     connect(rotationSlider, &QSlider::valueChanged, this, &MyOpenGLWidget::meshRotate);
 
-//    pitchSlider = new QSlider(this);
-//    pitchSlider->setMinimum(-45);
-//    pitchSlider->setMaximum(45);
-//    pitchSlider->setSingleStep(1);
-//    pitchSlider->setOrientation(Qt::Vertical);
-//    connect(pitchSlider, &QSlider::valueChanged, this, &MyOpenGLWidget::meshRotate);
+    pitchSlider = new QSlider(this);
+    pitchSlider->setMinimum(-60);
+    pitchSlider->setMaximum(60);
+    pitchSlider->setSingleStep(1);
+    pitchSlider->setOrientation(Qt::Vertical);
+    connect(pitchSlider, &QSlider::valueChanged, this, &MyOpenGLWidget::meshRotate);
 
     zoomScroll = new QSlider(this);
     zoomScroll->setMinimum(1);
@@ -71,6 +71,8 @@ void MyOpenGLWidget::meshRotate()
 {
     mesh.transform.rotation.y = rotationSlider->value();
     grid.transform.rotation.y = rotationSlider->value();
+    mesh.transform.rotation.x = pitchSlider->value();
+    grid.transform.rotation.x = pitchSlider->value();
     mesh.transform.apply();
     grid.transform.apply();
 //    double dist = 3;
@@ -80,7 +82,7 @@ void MyOpenGLWidget::meshRotate()
 //    camera.position.y = -GLfloat(sin(rad) * dist);
 //    camera.position.y = -GLfloat(tan(rad) * dist);
 //    camera.rotation.x = pitchSlider->value();
-    camera.apply();
+//    camera.apply();
     zoom_in = zoomScroll->value();
     update();
 }
@@ -248,7 +250,7 @@ void MyOpenGLWidget::resizeGL(int w, int h)
     addIndiceButton->setGeometry(w - 50, int(indiceButtonVector.size()) * hei, 50, hei / 2);
 
     rotationSlider->setGeometry(0, h - 50, 100, 20);
-//    pitchSlider->setGeometry(100, h - 50, 20, 50);
+    pitchSlider->setGeometry(100, h - 50, 20, 50);
     zoomScroll->setGeometry(0, h - 20, 100, 20);
 }
 
@@ -353,13 +355,24 @@ void MyOpenGLWidget::mouseMoveEvent(QMouseEvent *event)
 {
     if (event->buttons() & Qt::LeftButton) {
         if (lastMousePoint.x() != -1) {
-            mesh.transform.rotate(Vector3(0, 0.3f, 0) * (event->x() - lastMousePoint.x()) * cos(radians(mesh.transform.rotation.x)));
-            grid.transform.rotate(Vector3(0, 0.3f, 0) * (event->x() - lastMousePoint.x()) * cos(radians(mesh.transform.rotation.x)));
-            mesh.transform.rotate(Vector3(0, 0, -0.3f) * (event->x() - lastMousePoint.x()) * sin(radians(mesh.transform.rotation.x)));
-            grid.transform.rotate(Vector3(0, 0, -0.3f) * (event->x() - lastMousePoint.x()) * sin(radians(mesh.transform.rotation.x)));
+//            mesh.transform.rotate(Vector3(0, 0.3f, 0) * (event->x() - lastMousePoint.x()) * cos(radians(mesh.transform.rotation.x)));
+//            grid.transform.rotate(Vector3(0, 0.3f, 0) * (event->x() - lastMousePoint.x()) * cos(radians(mesh.transform.rotation.x)));
+            mesh.transform.rotate(Vector3(0, 0.3f, 0) * (event->x() - lastMousePoint.x()));
+            grid.transform.rotate(Vector3(0, 0.3f, 0) * (event->x() - lastMousePoint.x()));
+//            mesh.transform.rotate(Vector3(0, 0, -0.3f) * (event->x() - lastMousePoint.x()) * sin(radians(mesh.transform.rotation.x)));
+//            grid.transform.rotate(Vector3(0, 0, -0.3f) * (event->x() - lastMousePoint.x()) * sin(radians(mesh.transform.rotation.x)));
             mesh.transform.rotate(Vector3(-0.3f, 0, 0) * (event->y() - lastMousePoint.y()));
             grid.transform.rotate(Vector3(-0.3f, 0, 0) * (event->y() - lastMousePoint.y()));
+            if (mesh.transform.rotation.x > 60) {
+                mesh.transform.rotation.x = 60;
+                grid.transform.rotation.x = 60;
+            }
+            else if (mesh.transform.rotation.x < -60) {
+                mesh.transform.rotation.x = -60;
+                grid.transform.rotation.x = -60;
+            }
             rotationSlider->setValue(int(mesh.transform.rotation.y));
+            pitchSlider->setValue(int(mesh.transform.rotation.x));
         }
         lastMousePoint = event->pos();
     }
