@@ -53,22 +53,39 @@ MyOpenGLWidget::MyOpenGLWidget(QWidget *parent)
     connect(indiceSetDialog, &indiceDialog::delete_cmd, this, &MyOpenGLWidget::deleteindice);
     connect(indiceSetDialog, &indiceDialog::add, this, &MyOpenGLWidget::addindice);
 
+    // 2.0
     rightMenu = new QMenu(this);
+//    rightMenu->setContextMenuPolicy(Qt::CustomContextMenu);
     QAction *action_showButton = rightMenu->addAction(QString("EditorMode"));
     action_showButton->setCheckable(true);
     action_showButton->setChecked(true);
-    QAction *action_reset = rightMenu->addAction(QString("reset"));
+    QAction *action_triangleMode = rightMenu->addAction(QString("showSurface"));
+    action_triangleMode->setCheckable(true);
+    action_triangleMode->setChecked(true);
+    QAction *action_showGrid = rightMenu->addAction(QString("showGrid"));
+    action_showGrid->setCheckable(true);
+    action_showGrid->setChecked(true);
     rightMenu->addSeparator();
-    QAction *action_clear = rightMenu->addAction(QString("clear"));
+    QAction *action_reset = rightMenu->addAction(QString("reset"));
     QAction *action_reCube = rightMenu->addAction(QString("recube"));
+    QAction *action_clear = rightMenu->addAction(QString("clear"));
     connect(action_showButton, &QAction::triggered, this, &MyOpenGLWidget::showButton);
+    connect(action_triangleMode, &QAction::triggered, this, &MyOpenGLWidget::setShowMode);
+    connect(action_showGrid, &QAction::triggered, this, &MyOpenGLWidget::showGrid);
     connect(action_reset, &QAction::triggered, this, &MyOpenGLWidget::reset);
-    connect(action_clear, &QAction::triggered, this, &MyOpenGLWidget::clear);
     connect(action_reCube, &QAction::triggered, this, &MyOpenGLWidget::cube);
+    connect(action_clear, &QAction::triggered, this, &MyOpenGLWidget::clear);
+
+    onEditorMode = true;
+    onMouseMove = false;
+    gridMode = true;
+    surfaceMode = GL_TRIANGLES;
 }
 
 void MyOpenGLWidget::meshRotate()
 {
+    if (onMouseMove)
+        return;
     mesh.transform.rotation.y = rotationSlider->value();
     grid.transform.rotation.y = rotationSlider->value();
     mesh.transform.rotation.x = pitchSlider->value();
@@ -84,6 +101,7 @@ void MyOpenGLWidget::meshRotate()
 //    camera.rotation.x = pitchSlider->value();
 //    camera.apply();
     zoom_in = zoomScroll->value();
+    qDebug() << 1;
     update();
 }
 
@@ -225,13 +243,14 @@ void MyOpenGLWidget::paintGL()
     projection.perspective(zoom_in, GLfixed(w) / GLfloat(h), near_plane, far_plane);
     camera.get_view_matrix(view);
     mesh.draw(projection, view);
-    glDrawElements(GL_TRIANGLES, int(mesh.get_indices_len()), GL_UNSIGNED_INT, mesh.get_indice_data());
-//    glDrawElements(GL_LINE_STRIP, int(mesh.get_indices_len()), GL_UNSIGNED_INT, mesh.get_indice_data());
+    glDrawElements(surfaceMode, int(mesh.get_indices_len()), GL_UNSIGNED_INT, mesh.get_indice_data());
+//    glDrawElements(GL_LINES, int(mesh.get_indices_len()), GL_UNSIGNED_INT, mesh.get_indice_data());
     mesh.undraw();
-
-    grid.draw(projection, view);
-    glDrawElements(GL_LINES, int(grid.get_indices_len()), GL_UNSIGNED_INT, grid.get_indice_data());
-    grid.undraw();
+    if (gridMode) {
+        grid.draw(projection, view);
+        glDrawElements(GL_LINES, int(grid.get_indices_len()), GL_UNSIGNED_INT, grid.get_indice_data());
+        grid.undraw();
+    }
 }
 
 void MyOpenGLWidget::resizeGL(int w, int h)
@@ -240,15 +259,18 @@ void MyOpenGLWidget::resizeGL(int w, int h)
     for (GLuint i = 0; i < verticeButtonVector.size(); ++i) {
         QPushButton *curButton = verticeButtonVector[i];
         curButton->setGeometry(0, int(i) * hei, 200, hei);
+        curButton->setVisible(onEditorMode);
     }
     addVerticeButton->setGeometry(0, int(verticeButtonVector.size()) * hei, 50, hei / 2);
+    addVerticeButton->setVisible(onEditorMode);
     hei = std::min(60, h / int(mesh.get_indice_number() + 1));
     for (GLuint i = 0; i < indiceButtonVector.size(); ++i) {
         QPushButton *curButton = indiceButtonVector[i];
         curButton->setGeometry(w - 100, int(i) * hei, 100, hei);
+        curButton->setVisible(onEditorMode);
     }
     addIndiceButton->setGeometry(w - 50, int(indiceButtonVector.size()) * hei, 50, hei / 2);
-
+    addIndiceButton->setVisible(onEditorMode);
     rotationSlider->setGeometry(0, h - 50, 100, 20);
     pitchSlider->setGeometry(100, h - 50, 20, 50);
     zoomScroll->setGeometry(0, h - 20, 100, 20);
@@ -353,7 +375,8 @@ void MyOpenGLWidget::mousePressEvent(QMouseEvent *event)
 
 void MyOpenGLWidget::mouseMoveEvent(QMouseEvent *event)
 {
-    if (event->buttons() & Qt::LeftButton) {
+    if (event->buttons() & Qt::LeftButton && event->x() > 200 && event->x() < width() - 100) {
+        onMouseMove = true;
         if (lastMousePoint.x() != -1) {
 //            mesh.transform.rotate(Vector3(0, 0.3f, 0) * (event->x() - lastMousePoint.x()) * cos(radians(mesh.transform.rotation.x)));
 //            grid.transform.rotate(Vector3(0, 0.3f, 0) * (event->x() - lastMousePoint.x()) * cos(radians(mesh.transform.rotation.x)));
@@ -388,7 +411,7 @@ void MyOpenGLWidget::mouseReleaseEvent(QMouseEvent *event)
 
 void MyOpenGLWidget::wheelEvent(QWheelEvent *event)
 {
-    //    qDebug() << event->angleDelta();
+//    qDebug() << event->angleDelta();
     zoom_in -= event->angleDelta().y() / 24;
     if (zoom_in > 179)
         zoom_in = 179;
@@ -397,6 +420,12 @@ void MyOpenGLWidget::wheelEvent(QWheelEvent *event)
     }
     zoomScroll->setValue(int(zoom_in));
     update();
+}
+
+void MyOpenGLWidget::keyPressEvent(QKeyEvent *event)
+{
+    // short cut
+    // TODO...
 }
 
 void MyOpenGLWidget::showButton(bool isShow)
@@ -408,7 +437,21 @@ void MyOpenGLWidget::showButton(bool isShow)
         item->setVisible(isShow);
     addIndiceButton->setVisible(isShow);
     rotationSlider->setVisible(isShow);
+    pitchSlider->setVisible(isShow);
     zoomScroll->setVisible(isShow);
+    onEditorMode = isShow;
+}
+
+void MyOpenGLWidget::setShowMode(bool isShow)
+{
+    surfaceMode = isShow == false ? GL_LINE_STRIP : GL_TRIANGLES;
+    update();
+}
+
+void MyOpenGLWidget::showGrid(bool isShow)
+{
+    gridMode = isShow;
+    update();
 }
 
 void MyOpenGLWidget::reset()

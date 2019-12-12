@@ -60,13 +60,19 @@ private:
     QPoint lastMousePoint;
     // grid
     Mesh grid;
+    bool onEditorMode, onMouseMove, gridMode;
+    // surface
+    unsigned int surfaceMode;
 protected:
     void mousePressEvent(QMouseEvent *event);
     void mouseMoveEvent(QMouseEvent *event);
     void mouseReleaseEvent(QMouseEvent *event);
     void wheelEvent(QWheelEvent *event);
+    void keyPressEvent(QKeyEvent *event);
 public slots:
     void showButton(bool isShow);
+    void setShowMode(bool isShow);
+    void showGrid(bool isShow);
     void reset();
     void clear();
     void cube();
