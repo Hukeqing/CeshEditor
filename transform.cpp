@@ -78,6 +78,15 @@ Vector3 Vector3::operator*(float other) const
     return res;
 }
 
+Vector3 Vector3::operator*(double other) const
+{
+    Vector3 res(*this);
+    res.x *= float(other);
+    res.y *= float(other);
+    res.z *= float(other);
+    return res;
+}
+
 void Vector3::operator*=(int other)
 {
     this->x *= other;
@@ -90,6 +99,13 @@ void Vector3::operator*=(float other)
     this->x *= other;
     this->y *= other;
     this->z *= other;
+}
+
+void Vector3::operator*=(double other)
+{
+    this->x *= float(other);
+    this->y *= float(other);
+    this->z *= float(other);
 }
 
 QVector3D Vector3::data() const

@@ -58,6 +58,8 @@ private:
     // right menu
     QMenu *rightMenu;
     QPoint lastMousePoint;
+    // grid
+    Mesh grid;
 protected:
     void mousePressEvent(QMouseEvent *event);
     void mouseMoveEvent(QMouseEvent *event);
@@ -68,6 +70,7 @@ public slots:
     void reset();
     void clear();
     void cube();
+    void gridinit();
 };
 
 #endif // MYOPENGLWIDGET_H

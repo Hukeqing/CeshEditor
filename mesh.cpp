@@ -130,9 +130,9 @@ Color Mesh::get_vertice_color_class(GLuint index) const
     return Color(vertices.data() + index * 6 + 3);
 }
 /**    indice     **/
-void Mesh::push_indice(GLuint *ind, GLuint len)
+void Mesh::push_indice(GLuint *ind, GLuint num, GLuint len)
 {
-    for (GLuint i = 0; i < 3 * len; ++i)
+    for (GLuint i = 0; i < num * len; ++i)
         indices.push_back(*(ind + i));
 }
 
@@ -194,6 +194,12 @@ void Mesh::draw(const QMatrix4x4 &projection, const QMatrix4x4 &view)
     program->setUniformValue("model", model);
     program->setUniformValue("projection", projection);
     program->setUniformValue("view", view);
+}
+
+void Mesh::undraw()
+{
+    vbo.release();
+    program->release();
 }
 
 const GLuint *Mesh::get_indice_data() const

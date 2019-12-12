@@ -4,6 +4,8 @@
 #include <QOpenGLFunctions>
 #include <QMatrix4x4>
 
+double radians(GLfloat f);
+
 struct Vector3 {
     GLfloat x, y, z;
     Vector3();
@@ -17,8 +19,10 @@ struct Vector3 {
     void operator-=(const Vector3 &other);
     Vector3 operator*(int other) const;
     Vector3 operator*(float other) const;
+    Vector3 operator*(double other) const;
     void operator*=(int other);
     void operator*=(float other);
+    void operator*=(double other);
     void fit();
     QVector3D data() const;
 };

@@ -70,8 +70,9 @@ MyOpenGLWidget::MyOpenGLWidget(QWidget *parent)
 void MyOpenGLWidget::meshRotate()
 {
     mesh.transform.rotation.y = rotationSlider->value();
+    grid.transform.rotation.y = rotationSlider->value();
     mesh.transform.apply();
-
+    grid.transform.apply();
 //    double dist = 3;
 //    double rad = pitchSlider->value() / 180.0 * acos(-1);
 
@@ -204,6 +205,10 @@ void MyOpenGLWidget::initializeGL()
     cube();
     //    mesh.transform.rotate(Vector3(0, -60, -60));
     mesh.transform.translate(Vector3(0, 0, 3));
+
+    grid.init();
+    gridinit();
+    grid.transform.translate(Vector3(0, 0, 3));
 }
 
 void MyOpenGLWidget::paintGL()
@@ -218,8 +223,13 @@ void MyOpenGLWidget::paintGL()
     projection.perspective(zoom_in, GLfixed(w) / GLfloat(h), near_plane, far_plane);
     camera.get_view_matrix(view);
     mesh.draw(projection, view);
-
     glDrawElements(GL_TRIANGLES, int(mesh.get_indices_len()), GL_UNSIGNED_INT, mesh.get_indice_data());
+//    glDrawElements(GL_LINE_STRIP, int(mesh.get_indices_len()), GL_UNSIGNED_INT, mesh.get_indice_data());
+    mesh.undraw();
+
+    grid.draw(projection, view);
+    glDrawElements(GL_LINES, int(grid.get_indices_len()), GL_UNSIGNED_INT, grid.get_indice_data());
+    grid.undraw();
 }
 
 void MyOpenGLWidget::resizeGL(int w, int h)
@@ -343,8 +353,12 @@ void MyOpenGLWidget::mouseMoveEvent(QMouseEvent *event)
 {
     if (event->buttons() & Qt::LeftButton) {
         if (lastMousePoint.x() != -1) {
-            mesh.transform.rotate(Vector3(0, 0.3f, 0) * (event->x() - lastMousePoint.x()));
+            mesh.transform.rotate(Vector3(0, 0.3f, 0) * (event->x() - lastMousePoint.x()) * cos(radians(mesh.transform.rotation.x)));
+            grid.transform.rotate(Vector3(0, 0.3f, 0) * (event->x() - lastMousePoint.x()) * cos(radians(mesh.transform.rotation.x)));
+            mesh.transform.rotate(Vector3(0, 0, -0.3f) * (event->x() - lastMousePoint.x()) * sin(radians(mesh.transform.rotation.x)));
+            grid.transform.rotate(Vector3(0, 0, -0.3f) * (event->x() - lastMousePoint.x()) * sin(radians(mesh.transform.rotation.x)));
             mesh.transform.rotate(Vector3(-0.3f, 0, 0) * (event->y() - lastMousePoint.y()));
+            grid.transform.rotate(Vector3(-0.3f, 0, 0) * (event->y() - lastMousePoint.y()));
             rotationSlider->setValue(int(mesh.transform.rotation.y));
         }
         lastMousePoint = event->pos();
@@ -389,7 +403,9 @@ void MyOpenGLWidget::reset()
     zoom_in = 45.0f;
     zoomScroll->setValue(45);
     mesh.transform.rotation = Vector3(0, 0, 0);
+    grid.transform.rotation = Vector3(0, 0, 0);
     mesh.transform.apply();
+    grid.transform.apply();
     rotationSlider->setValue(0);
     update();
 }
@@ -444,4 +460,20 @@ void MyOpenGLWidget::cube()
     GUI();
     resizeGL(width(), height());
     update();
+}
+
+void MyOpenGLWidget::gridinit() {
+    GLfloat ver[] = { 0.0f,  0.0f,  0.0f, 0.0f, 0.0f, 1.0f,
+                      0.0f,  0.0f, 10.0f, 0.0f, 0.0f, 1.0f,
+                      0.0f,  0.0f,  0.0f, 0.0f, 1.0f, 0.0f,
+                      0.0f, 10.0f,  0.0f, 0.0f, 1.0f, 0.0f,
+                      0.0f,  0.0f,  0.0f, 1.0f, 0.0f, 0.0f,
+                     10.0f,  0.0f,  0.0f, 1.0f, 0.0f, 0.0f,
+                      0.0f,  0.0f,  0.0f, 1.0f, 1.0f, 1.0f,
+                    -10.0f,  0.0f,  0.0f, 1.0f, 1.0f, 1.0f,
+                      0.0f,-10.0f,  0.0f, 1.0f, 1.0f, 1.0f,
+                      0.0f,  0.0f,-10.0f, 1.0f, 1.0f, 1.0f};
+    GLuint ind[] = {0, 1, 2, 3, 4, 5, 6, 7, 6, 8, 6, 9};
+    grid.push_vertice(ver, 10);
+    grid.push_indice(ind, 6, 2);
 }

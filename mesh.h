@@ -30,7 +30,7 @@ public:
     void change_vertice(GLuint index, GLfloat *value);
     Color get_vertice_color_class(GLuint index) const;
     // indice
-    void push_indice(GLuint *ind, GLuint len = 1);
+    void push_indice(GLuint *ind, GLuint num = 1, GLuint len = 3);
     void erase_indice(GLuint pos);
     const vector<GLuint> &get_indice() const;
     const GLuint *get_indice(GLuint pos) const;
@@ -40,6 +40,7 @@ public:
     QString get_indice_3colorCup(GLuint index);
     // draw
     void draw(const QMatrix4x4 &projection, const QMatrix4x4 &view);
+    void undraw();
     const GLuint *get_indice_data() const;
     GLuint get_indices_len() const;
     Transform transform;                // 模型矩阵
