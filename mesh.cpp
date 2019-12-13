@@ -212,6 +212,18 @@ GLuint Mesh::get_indices_len() const
     return GLuint(indices.size());
 }
 
+// 2.0
+void Mesh::writeCesh(std::fstream &out)
+{
+    out << "Cesh file, Copyleft @ 2019 mauve" << endl;
+    out << VERSION << endl;
+}
+
+void Mesh::writeObj(std::fstream &out)
+{
+
+}
+
 void Mesh::clear()
 {
     vertices.clear();
@@ -219,26 +231,4 @@ void Mesh::clear()
     vbo.bind();
     vbo.allocate(vertices.data(), int(vertices.size() * sizeof (GLfloat)));
     vbo.release();
-}
-
-void Mesh::writeCesh(std::fstream &out)
-{
-    out << "Cesh file, Copyleft @ 2019 mauve" << endl;
-    out << VERSION << endl;
-    char *verticesBegin = reinterpret_cast<char *>(vertices.data());
-    char *verticesEnd = reinterpret_cast<char *>(vertices.data() + vertices.size());
-    out << std::distance(verticesBegin, verticesEnd) << endl;
-    auto iter = verticesBegin;
-    while (iter != verticesEnd) {
-        out << *iter;
-        iter++;
-    }
-    char *indicesBegin = reinterpret_cast<char *>(vertices.data());
-    char *indicesEnd = reinterpret_cast<char *>(vertices.data() + vertices.size());
-    out << std::distance(indicesEnd, indicesBegin) << endl;
-    iter = indicesBegin;
-    while (iter != indicesEnd) {
-        out << *iter;
-        iter++;
-    }
 }

@@ -60,8 +60,11 @@ private:
     QPoint lastMousePoint;
     // grid
     Mesh grid;
+    // onEditorMode: is show other thing like button...
+    // onMouseMove: is the mouse on move, so there is no need to care about the slider
+    // gridMode: is show the grid
     bool onEditorMode, onMouseMove, gridMode;
-    // surface
+    // surface show mode : triangle or lines
     unsigned int surfaceMode;
 protected:
     void mousePressEvent(QMouseEvent *event);
@@ -71,8 +74,6 @@ protected:
     void keyPressEvent(QKeyEvent *event);
 public slots:
     void showButton(bool isShow);
-    void setShowMode(bool isShow);
-    void showGrid(bool isShow);
     void reset();
     void clear();
     void cube();

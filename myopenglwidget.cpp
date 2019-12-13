@@ -69,12 +69,15 @@ MyOpenGLWidget::MyOpenGLWidget(QWidget *parent)
     QAction *action_reset = rightMenu->addAction(QString("reset"));
     QAction *action_reCube = rightMenu->addAction(QString("recube"));
     QAction *action_clear = rightMenu->addAction(QString("clear"));
+    rightMenu->addSeparator();
+    QAction *action_exit = rightMenu->addAction(QString("Exit"));
     connect(action_showButton, &QAction::triggered, this, &MyOpenGLWidget::showButton);
-    connect(action_triangleMode, &QAction::triggered, this, &MyOpenGLWidget::setShowMode);
-    connect(action_showGrid, &QAction::triggered, this, &MyOpenGLWidget::showGrid);
+    connect(action_triangleMode, &QAction::triggered, this, [&](bool isShow) {surfaceMode = isShow == false ? GL_LINE_STRIP : GL_TRIANGLES; update();});
+    connect(action_showGrid, &QAction::triggered, this, [&](bool isShow) {this->gridMode = isShow; update();});
     connect(action_reset, &QAction::triggered, this, &MyOpenGLWidget::reset);
     connect(action_reCube, &QAction::triggered, this, &MyOpenGLWidget::cube);
     connect(action_clear, &QAction::triggered, this, &MyOpenGLWidget::clear);
+    connect(action_exit, &QAction::triggered, this, [&](){this->close();});
 
     onEditorMode = true;
     onMouseMove = false;
@@ -424,8 +427,13 @@ void MyOpenGLWidget::wheelEvent(QWheelEvent *event)
 
 void MyOpenGLWidget::keyPressEvent(QKeyEvent *event)
 {
-    // short cut
-    // TODO...
+    if (event->modifiers() == Qt::ControlModifier) {
+        // TODO...
+    } else if (event->key() == Qt::Key_Escape) {
+        this->close();
+    } else {
+        QOpenGLWidget::keyPressEvent(event);
+    }
 }
 
 void MyOpenGLWidget::showButton(bool isShow)
@@ -440,18 +448,6 @@ void MyOpenGLWidget::showButton(bool isShow)
     pitchSlider->setVisible(isShow);
     zoomScroll->setVisible(isShow);
     onEditorMode = isShow;
-}
-
-void MyOpenGLWidget::setShowMode(bool isShow)
-{
-    surfaceMode = isShow == false ? GL_LINE_STRIP : GL_TRIANGLES;
-    update();
-}
-
-void MyOpenGLWidget::showGrid(bool isShow)
-{
-    gridMode = isShow;
-    update();
 }
 
 void MyOpenGLWidget::reset()
