@@ -66,9 +66,9 @@ MyOpenGLWidget::MyOpenGLWidget(QWidget *parent)
     action_showGrid->setCheckable(true);
     action_showGrid->setChecked(true);
     rightMenu->addSeparator();
-    QAction *action_reset = rightMenu->addAction(QString("reset"));
+    QAction *action_reset = rightMenu->addAction(QString("reset\tCtrl+R"));
     QAction *action_reCube = rightMenu->addAction(QString("recube"));
-    QAction *action_clear = rightMenu->addAction(QString("clear"));
+    QAction *action_clear = rightMenu->addAction(QString("clear\tCtrl+C"));
     rightMenu->addSeparator();
     QAction *action_exit = rightMenu->addAction(QString("Exit"));
     connect(action_showButton, &QAction::triggered, this, &MyOpenGLWidget::showButton);
@@ -78,6 +78,12 @@ MyOpenGLWidget::MyOpenGLWidget(QWidget *parent)
     connect(action_reCube, &QAction::triggered, this, &MyOpenGLWidget::cube);
     connect(action_clear, &QAction::triggered, this, &MyOpenGLWidget::clear);
     connect(action_exit, &QAction::triggered, this, [&](){this->close();});
+
+//    fstream t;
+//    t.open("D:\\out.txt");
+    freopen("D:\\test.txt", "w", stdout);
+    QAction *test = rightMenu->addAction(QString("Test"));
+    connect(test, &QAction::triggered, this, [&](){this->mesh.writeCesh();});
 
     onEditorMode = true;
     onMouseMove = false;
@@ -232,6 +238,7 @@ void MyOpenGLWidget::initializeGL()
     grid.init();
     gridinit();
     grid.transform.translate(Vector3(0, 0, 3));
+//    glPolygonMode(GL_FRONT_AND_BACK, GL_LINE);
 }
 
 void MyOpenGLWidget::paintGL()
@@ -428,7 +435,14 @@ void MyOpenGLWidget::wheelEvent(QWheelEvent *event)
 void MyOpenGLWidget::keyPressEvent(QKeyEvent *event)
 {
     if (event->modifiers() == Qt::ControlModifier) {
-        // TODO...
+        switch (event->key()) {
+        case Qt::Key_R:
+            reset();
+            break;
+        case Qt::Key_C:
+            clear();
+            break;
+        }
     } else if (event->key() == Qt::Key_Escape) {
         this->close();
     } else {

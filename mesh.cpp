@@ -213,15 +213,25 @@ GLuint Mesh::get_indices_len() const
 }
 
 // 2.0
-void Mesh::writeCesh(std::fstream &out)
+void Mesh::writeCesh(std::ostream &out)
 {
     out << "Cesh file, Copyleft @ 2019 mauve" << endl;
-    out << VERSION << endl;
+    out << VERSION << " " << this->vertices.size() << " " << this->indices.size() << endl;
+    for (size_t index = 0; index < this->vertices.size(); index += 6)
+        out << this->vertices[index + 0] << " " << this->vertices[index + 1] << " " << this->vertices[index + 2]
+            << this->vertices[index + 3] << " " << this->vertices[index + 4] << " " << this->vertices[index + 5] << endl;
+    for (size_t index = 0; index < this->indices.size(); index += 3)
+        out << this->indices[index + 0] << " " << this->indices[index + 1] << " " << this->indices[index + 2] << endl;
 }
 
 void Mesh::writeObj(std::fstream &out)
 {
-
+    out << "# Made by Cesh Editor, Copyleft @ 2019 mauve" << endl;
+    out << "# " << VERSION << " Vertice: " << this->vertices.size() << " Face: " << this->indices.size() << endl;
+    for (size_t index = 0; index < this->vertices.size(); index += 6)
+        out << "v " << this->vertices[index + 0] << " " << this->vertices[index + 1] << " " << this->vertices[index + 2] << endl;
+    for (size_t index = 0; index < this->indices.size(); index += 3)
+        out << "f " << this->indices[index + 0] << " " << this->indices[index + 1] << " " << this->indices[index + 2] << endl;
 }
 
 void Mesh::clear()

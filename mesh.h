@@ -6,11 +6,13 @@
 #include <vector>
 #include <QColor>
 #include <fstream>
+#include <iostream>
 #include "transform.h"
 #include "color.h"
 
 using std::vector;
 using std::fstream;
+using std::ostream;
 
 class Mesh
 {
@@ -45,7 +47,7 @@ public:
     GLuint get_indices_len() const;
     Transform transform;                // 模型矩阵
     // 2.0
-    void writeCesh(fstream &out);
+    void writeCesh(std::ostream &out = std::cout);
     void writeObj(fstream &out);
     void clear();
 private:
