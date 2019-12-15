@@ -8,9 +8,11 @@
 #include <QPushButton>
 #include <QSlider>
 #include <QMenu>
+#include <QFileDialog>
 #include "mesh.h"
 #include "verticedialog.h"
 #include "indicedialog.h"
+#include <QFile>
 
 class MyOpenGLWidget : public QOpenGLWidget, protected QOpenGLFunctions
 {
@@ -66,6 +68,9 @@ private:
     bool onEditorMode, onMouseMove, gridMode;
     // surface show mode : triangle or lines
     unsigned int surfaceMode;
+    // save and load
+    QString saveFile;
+    bool isSaved;
 protected:
     void mousePressEvent(QMouseEvent *event);
     void mouseMoveEvent(QMouseEvent *event);
@@ -78,6 +83,10 @@ public slots:
     void clear();
     void cube();
     void gridinit();
+    // save and load
+    void saveCesh();
+    void saveAs();
+    void setTitle();
 };
 
 #endif // MYOPENGLWIDGET_H

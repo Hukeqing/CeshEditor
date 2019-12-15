@@ -1,7 +1,10 @@
 ﻿#include "mesh.h"
 #include "defination.h"
+#include <string>
+#include <iostream>
 
 using std::endl;
+using std::string;
 
 void Mesh::init()
 {
@@ -213,7 +216,7 @@ GLuint Mesh::get_indices_len() const
 }
 
 // 2.0
-void Mesh::writeCesh(std::ostream &out)
+void Mesh::writeCesh(QTextStream &out)
 {
     out << "Cesh file, Copyleft @ 2019 mauve" << endl;
     out << VERSION << " " << this->vertices.size() << " " << this->indices.size() << endl;
@@ -224,14 +227,37 @@ void Mesh::writeCesh(std::ostream &out)
         out << this->indices[index + 0] << " " << this->indices[index + 1] << " " << this->indices[index + 2] << endl;
 }
 
-void Mesh::writeObj(std::fstream &out)
+void Mesh::writeObj(QTextStream &out)
 {
     out << "# Made by Cesh Editor, Copyleft @ 2019 mauve" << endl;
-    out << "# " << VERSION << " Vertice: " << this->vertices.size() << " Face: " << this->indices.size() << endl;
+    out << "# " << VERSION << endl << "# Vertice: " << this->vertices.size() << endl << "# Face: " << this->indices.size() << endl;
     for (size_t index = 0; index < this->vertices.size(); index += 6)
         out << "v " << this->vertices[index + 0] << " " << this->vertices[index + 1] << " " << this->vertices[index + 2] << endl;
     for (size_t index = 0; index < this->indices.size(); index += 3)
-        out << "f " << this->indices[index + 0] << " " << this->indices[index + 1] << " " << this->indices[index + 2] << endl;
+        out << "f " << this->indices[index + 0] + 1 << " " << this->indices[index + 1] + 1 << " " << this->indices[index + 2] + 1 << endl;
+}
+
+void Mesh::loadCesh(std::istream &in)
+{
+    clear();
+    string tmp;
+    std::getline(in, tmp);
+    int version, verticenum, indicenum;
+    in >> version >> verticenum >> indicenum;
+    for (int index = 0; index < verticenum; ++index) {
+        float tmpVerticeValue;
+        for (int i = 0; i < 6; ++i) {
+            in >> tmpVerticeValue;
+            vertices.push_back(tmpVerticeValue);
+        }
+    }
+    for (int index = 0; index < indicenum; ++index) {
+        GLuint tmpIndiceValue;
+        for (int i = 0; i < 3; ++i) {
+            in >> tmpIndiceValue;
+            indices.push_back(tmpIndiceValue);
+        }
+    }
 }
 
 void Mesh::clear()

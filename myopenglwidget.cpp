@@ -8,6 +8,7 @@
 #include <cmath>
 #include <QMouseEvent>
 #include <QDebug>
+#include "defination.h"
 // 1.0
 MyOpenGLWidget::MyOpenGLWidget(QWidget *parent)
     : QOpenGLWidget(parent)
@@ -66,6 +67,9 @@ MyOpenGLWidget::MyOpenGLWidget(QWidget *parent)
     action_showGrid->setCheckable(true);
     action_showGrid->setChecked(true);
     rightMenu->addSeparator();
+    QAction *action_save = rightMenu->addAction(QString("Save\tCtrl+S"));
+    QAction *action_save_as = rightMenu->addAction(QString("Save as..."));
+    rightMenu->addSeparator();
     QAction *action_reset = rightMenu->addAction(QString("reset\tCtrl+R"));
     QAction *action_reCube = rightMenu->addAction(QString("recube"));
     QAction *action_clear = rightMenu->addAction(QString("clear\tCtrl+C"));
@@ -74,21 +78,22 @@ MyOpenGLWidget::MyOpenGLWidget(QWidget *parent)
     connect(action_showButton, &QAction::triggered, this, &MyOpenGLWidget::showButton);
     connect(action_triangleMode, &QAction::triggered, this, [&](bool isShow) {surfaceMode = isShow == false ? GL_LINE_STRIP : GL_TRIANGLES; update();});
     connect(action_showGrid, &QAction::triggered, this, [&](bool isShow) {this->gridMode = isShow; update();});
+    connect(action_save, &QAction::triggered, this, &MyOpenGLWidget::saveCesh);
+    connect(action_save_as, &QAction::triggered, this, &MyOpenGLWidget::saveAs);
     connect(action_reset, &QAction::triggered, this, &MyOpenGLWidget::reset);
     connect(action_reCube, &QAction::triggered, this, &MyOpenGLWidget::cube);
     connect(action_clear, &QAction::triggered, this, &MyOpenGLWidget::clear);
     connect(action_exit, &QAction::triggered, this, [&](){this->close();});
 
-//    fstream t;
-//    t.open("D:\\out.txt");
-    freopen("D:\\test.txt", "w", stdout);
-    QAction *test = rightMenu->addAction(QString("Test"));
-    connect(test, &QAction::triggered, this, [&](){this->mesh.writeCesh();});
-
     onEditorMode = true;
     onMouseMove = false;
     gridMode = true;
     surfaceMode = GL_TRIANGLES;
+    saveFile.clear();
+    isSaved = false;
+
+    this->setMinimumSize(QSize(800, 600));
+    this->setTitle();
 }
 
 void MyOpenGLWidget::meshRotate()
@@ -110,7 +115,6 @@ void MyOpenGLWidget::meshRotate()
 //    camera.rotation.x = pitchSlider->value();
 //    camera.apply();
     zoom_in = zoomScroll->value();
-    qDebug() << 1;
     update();
 }
 
@@ -421,15 +425,16 @@ void MyOpenGLWidget::mouseReleaseEvent(QMouseEvent *event)
 
 void MyOpenGLWidget::wheelEvent(QWheelEvent *event)
 {
-//    qDebug() << event->angleDelta();
-    zoom_in -= event->angleDelta().y() / 24;
-    if (zoom_in > 179)
-        zoom_in = 179;
-    else if (zoom_in < 1) {
-        zoom_in = 1;
+    if (event->x() > 200 && event->x() < width() - 100) {
+        //    qDebug() << event->angleDelta();
+        zoom_in -= event->angleDelta().y() / 24;
+        if (zoom_in > 179)
+            zoom_in = 179;
+        else if (zoom_in < 1)
+            zoom_in = 1;
+        zoomScroll->setValue(int(zoom_in));
+        update();
     }
-    zoomScroll->setValue(int(zoom_in));
-    update();
 }
 
 void MyOpenGLWidget::keyPressEvent(QKeyEvent *event)
@@ -441,6 +446,9 @@ void MyOpenGLWidget::keyPressEvent(QKeyEvent *event)
             break;
         case Qt::Key_C:
             clear();
+            break;
+        case Qt::Key_S:
+            saveCesh();
             break;
         }
     } else if (event->key() == Qt::Key_Escape) {
@@ -501,13 +509,13 @@ void MyOpenGLWidget::cube()
     GLfloat ver[] = {// front
         -0.5f,  0.5f,  0.5f, 1.0f, 0.0f, 0.0f,     // 0 RT
         -0.5f, -0.5f,  0.5f, 1.0f, 1.0f, 0.0f,     // 1 RB
-        0.5f, -0.5f,  0.5f, 0.0f, 1.0f, 0.0f,     // 2 LB
-        0.5f,  0.5f,  0.5f, 0.0f, 0.0f, 0.0f,     // 3 LT
+         0.5f, -0.5f,  0.5f, 0.0f, 1.0f, 0.0f,     // 2 LB
+         0.5f,  0.5f,  0.5f, 0.0f, 0.0f, 0.0f,     // 3 LT
         // back
         -0.5f,  0.5f, -0.5f, 1.0f, 0.0f, 1.0f,     // 4 RT
         -0.5f, -0.5f, -0.5f, 1.0f, 1.0f, 1.0f,     // 5 RB
-        0.5f, -0.5f, -0.5f, 0.0f, 1.0f, 1.0f,     // 6 LB
-        0.5f,  0.5f, -0.5f, 0.0f, 0.0f, 1.0f      // 7 LT
+         0.5f, -0.5f, -0.5f, 0.0f, 1.0f, 1.0f,     // 6 LB
+         0.5f,  0.5f, -0.5f, 0.0f, 0.0f, 1.0f      // 7 LT
     };
     GLuint ind[] = {0, 1, 3,
                     1, 2, 3,
@@ -542,4 +550,52 @@ void MyOpenGLWidget::gridinit() {
     GLuint ind[] = {0, 1, 2, 3, 4, 5, 6, 7, 6, 8, 6, 9};
     grid.push_vertice(ver, 10);
     grid.push_indice(ind, 6, 2);
+}
+
+void MyOpenGLWidget::saveCesh()
+{
+    if (this->saveFile.size() == 0)
+        saveFile = QFileDialog::getSaveFileName(this, QString("Save as a cesh file"), QString("."), QString("Cesh File(*.cesh)"));
+    if (saveFile.size() == 0)
+        return;
+    QFile file(saveFile);
+    if (!file.open(QIODevice::WriteOnly)) {
+        QMessageBox::critical(this, QString("Error"), QString("open file fail!\nPlease try again"));
+        saveFile.clear();
+        file.close();
+        return;
+    }
+    QTextStream out(&file);
+    mesh.writeCesh(out);
+}
+
+void MyOpenGLWidget::saveAs()
+{
+    QString tempFile = QFileDialog::getSaveFileName(this, QString("Save as another file"), QString("."), QString("Cesh File(*.cesh);;Obj File(*.obj)"));
+    if (tempFile.size() == 0)
+        return;
+    QFile file(tempFile);
+    if (tempFile.section('.', -1) == QString("obj"))
+        QMessageBox::information(this, QString("Hint"), QString("Save as a obj file will lose color information!"));
+    if (!file.open(QIODevice::WriteOnly)) {
+        QMessageBox::critical(this, QString("Error"), QString("save error!\nPlease try again"));
+        saveFile.clear();
+        file.close();
+        return;
+    }
+    QTextStream out(&file);
+    mesh.writeObj(out);
+}
+
+void MyOpenGLWidget::setTitle()
+{
+    QString title;
+    if (!this->isSaved)
+        title += "*";
+    if (this->saveFile.size() == 0)
+        title += "New Cesh";
+    else {
+        title += saveFile;
+    }
+    title += "- CeshEditor" + QString::number(VERSION >> 8);
 }

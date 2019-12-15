@@ -5,14 +5,14 @@
 #include <QOpenGLBuffer>
 #include <vector>
 #include <QColor>
-#include <fstream>
 #include <iostream>
+#include <QTextStream>
 #include "transform.h"
 #include "color.h"
 
 using std::vector;
-using std::fstream;
 using std::ostream;
+using std::istream;
 
 class Mesh
 {
@@ -47,8 +47,9 @@ public:
     GLuint get_indices_len() const;
     Transform transform;                // 模型矩阵
     // 2.0
-    void writeCesh(std::ostream &out = std::cout);
-    void writeObj(fstream &out);
+    void writeCesh(QTextStream &out);
+    void writeObj(QTextStream &out);
+    void loadCesh(istream &in);
     void clear();
 private:
     vector<GLfloat> vertices;           // 顶点信息
