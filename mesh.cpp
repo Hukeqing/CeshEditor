@@ -221,7 +221,7 @@ void Mesh::writeCesh(QTextStream &out)
     out << "Cesh file, Copyleft @ 2019 mauve" << endl;
     out << VERSION << " " << this->vertices.size() << " " << this->indices.size() << endl;
     for (size_t index = 0; index < this->vertices.size(); index += 6)
-        out << this->vertices[index + 0] << " " << this->vertices[index + 1] << " " << this->vertices[index + 2]
+        out << this->vertices[index + 0] << " " << this->vertices[index + 1] << " " << this->vertices[index + 2] << " "
             << this->vertices[index + 3] << " " << this->vertices[index + 4] << " " << this->vertices[index + 5] << endl;
     for (size_t index = 0; index < this->indices.size(); index += 3)
         out << this->indices[index + 0] << " " << this->indices[index + 1] << " " << this->indices[index + 2] << endl;
@@ -237,27 +237,31 @@ void Mesh::writeObj(QTextStream &out)
         out << "f " << this->indices[index + 0] + 1 << " " << this->indices[index + 1] + 1 << " " << this->indices[index + 2] + 1 << endl;
 }
 
-void Mesh::loadCesh(std::istream &in)
+void Mesh::loadCesh(QTextStream &in)
 {
     clear();
     string tmp;
-    std::getline(in, tmp);
+//    std::getline(in, tmp);
+    in.readLine(1000);
     int version, verticenum, indicenum;
     in >> version >> verticenum >> indicenum;
-    for (int index = 0; index < verticenum; ++index) {
+    for (int index = 0; index < verticenum / 6; ++index) {
         float tmpVerticeValue;
         for (int i = 0; i < 6; ++i) {
             in >> tmpVerticeValue;
             vertices.push_back(tmpVerticeValue);
         }
     }
-    for (int index = 0; index < indicenum; ++index) {
+    for (int index = 0; index < indicenum / 3; ++index) {
         GLuint tmpIndiceValue;
         for (int i = 0; i < 3; ++i) {
             in >> tmpIndiceValue;
             indices.push_back(tmpIndiceValue);
         }
     }
+    vbo.bind();
+    vbo.allocate(vertices.data(), int(vertices.size() * sizeof (GLfloat)));
+    vbo.release();
 }
 
 void Mesh::clear()

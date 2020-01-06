@@ -69,6 +69,7 @@ MyOpenGLWidget::MyOpenGLWidget(QWidget *parent)
     rightMenu->addSeparator();
     QAction *action_save = rightMenu->addAction(QString("Save\tCtrl+S"));
     QAction *action_save_as = rightMenu->addAction(QString("Save as..."));
+    QAction *action_open = rightMenu->addAction(QString("Open"));
     rightMenu->addSeparator();
     QAction *action_reset = rightMenu->addAction(QString("reset\tCtrl+R"));
     QAction *action_reCube = rightMenu->addAction(QString("recube"));
@@ -80,6 +81,7 @@ MyOpenGLWidget::MyOpenGLWidget(QWidget *parent)
     connect(action_showGrid, &QAction::triggered, this, [&](bool isShow) {this->gridMode = isShow; update();});
     connect(action_save, &QAction::triggered, this, &MyOpenGLWidget::saveCesh);
     connect(action_save_as, &QAction::triggered, this, &MyOpenGLWidget::saveAs);
+    connect(action_open, &QAction::triggered, this, &MyOpenGLWidget::open);
     connect(action_reset, &QAction::triggered, this, &MyOpenGLWidget::reset);
     connect(action_reCube, &QAction::triggered, this, &MyOpenGLWidget::cube);
     connect(action_clear, &QAction::triggered, this, &MyOpenGLWidget::clear);
@@ -141,6 +143,8 @@ void MyOpenGLWidget::verticeSet(int index, float x, float y, float z, float r, f
     mesh.change_vertice(GLuint(index), newVertice);
     reGUI_vertice(GLuint(index));
     update();
+    this->isSaved = false;
+    setTitle();
 }
 
 void MyOpenGLWidget::addVertice(float x, float y, float z, float r, float g, float b)
@@ -148,6 +152,8 @@ void MyOpenGLWidget::addVertice(float x, float y, float z, float r, float g, flo
     GLfloat newVertice[6] = {x, y, z, r / 255, g / 255, b / 255};
     mesh.push_vertice(newVertice);
     add_verticeGUI();
+    this->isSaved = false;
+    setTitle();
 }
 
 void MyOpenGLWidget::deleteVertice(int index)
@@ -162,6 +168,8 @@ void MyOpenGLWidget::deleteVertice(int index)
         for (GLuint i = GLuint(index); i < mesh.get_vertice_number(); ++i)
             reGUI_vertice(i);
         resizeGL(width(), height());
+        this->isSaved = false;
+        setTitle();
     } else {
         QMessageBox::critical(this, "Error!", "the max of indices is the same as the lengh of vertices!", QMessageBox::Ok);
     }
@@ -200,6 +208,8 @@ void MyOpenGLWidget::indiceSet(int index, unsigned int a, unsigned int b, unsign
     mesh.change_indice(GLuint(index), newIndice);
     reGUI_indice(GLuint(index));
     update();
+    this->isSaved = false;
+    setTitle();
 }
 
 void MyOpenGLWidget::addindice(unsigned int a, unsigned int b, unsigned int c)
@@ -217,6 +227,8 @@ void MyOpenGLWidget::addindice(unsigned int a, unsigned int b, unsigned int c)
     GLuint newIndice[3] = {GLuint(a), GLuint(b), GLuint(c)};
     mesh.push_indice(newIndice);
     add_indiceGUI();
+    this->isSaved = false;
+    setTitle();
 }
 
 void MyOpenGLWidget::deleteindice(int index)
@@ -227,6 +239,8 @@ void MyOpenGLWidget::deleteindice(int index)
     for (GLuint i = GLuint(index); i < mesh.get_indice_number(); ++i)
         reGUI_indice(i);
     resizeGL(width(), height());
+    this->isSaved = false;
+    setTitle();
 }
 
 void MyOpenGLWidget::initializeGL()
@@ -482,6 +496,8 @@ void MyOpenGLWidget::reset()
     grid.transform.apply();
     rotationSlider->setValue(0);
     update();
+    this->isSaved = false;
+    setTitle();
 }
 
 void MyOpenGLWidget::clear()
@@ -495,6 +511,8 @@ void MyOpenGLWidget::clear()
     indiceButtonVector.clear();
     resizeGL(width(), height());
     update();
+    this->isSaved = false;
+    setTitle();
 }
 
 void MyOpenGLWidget::cube()
@@ -567,6 +585,8 @@ void MyOpenGLWidget::saveCesh()
     }
     QTextStream out(&file);
     mesh.writeCesh(out);
+    this->isSaved = true;
+    setTitle();
 }
 
 void MyOpenGLWidget::saveAs()
@@ -587,6 +607,26 @@ void MyOpenGLWidget::saveAs()
     mesh.writeObj(out);
 }
 
+void MyOpenGLWidget::open()
+{
+    QString tempFile = QFileDialog::getOpenFileName(this, QString("Open"), QString("."), QString("Cesh File(*.cesh);;Obj File(*.obj)"));
+    if (tempFile.section('.', -1) == QString("cesh")) {
+        QFile file(tempFile);
+        if (!file.open(QIODevice::ReadOnly)) {
+            QMessageBox::critical(this, QString("Error"), QString("save error!\nPlease try again"));
+            saveFile.clear();
+            file.close();
+            return;
+        }
+        QTextStream in(&file);
+        mesh.loadCesh(in);
+    }
+    GUI();
+    resizeGL(width(), height());
+    this->isSaved = true;
+    setTitle();
+}
+
 void MyOpenGLWidget::setTitle()
 {
     QString title;
@@ -598,4 +638,5 @@ void MyOpenGLWidget::setTitle()
         title += saveFile;
     }
     title += "- CeshEditor" + QString::number(VERSION >> 8);
+    setWindowTitle(title);
 }

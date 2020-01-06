@@ -11,8 +11,6 @@
 #include "color.h"
 
 using std::vector;
-using std::ostream;
-using std::istream;
 
 class Mesh
 {
@@ -49,7 +47,7 @@ public:
     // 2.0
     void writeCesh(QTextStream &out);
     void writeObj(QTextStream &out);
-    void loadCesh(istream &in);
+    void loadCesh(QTextStream &in);
     void clear();
 private:
     vector<GLfloat> vertices;           // 顶点信息

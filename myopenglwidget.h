@@ -86,6 +86,7 @@ public slots:
     // save and load
     void saveCesh();
     void saveAs();
+    void open();
     void setTitle();
 };
 
